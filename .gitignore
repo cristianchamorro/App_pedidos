@@ -1,0 +1,28 @@
+# Node.js
+app_backend/node_modules/
+app_backend/.env
+npm-debug.log
+yarn-error.log
+
+# Flutter / Dart
+app_frontend/build/
+app_frontend/.dart_tool/
+app_frontend/.packages
+app_frontend/.pub/
+app_frontend/pubspec.lock
+
+# Android (si compilas APK desde Flutter)
+app_frontend/android/.gradle/
+app_frontend/android/local.properties
+app_frontend/android/app/*.iml
+*.apk
+*.aab
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# Sistema
+.DS_Store
+Thumbs.db

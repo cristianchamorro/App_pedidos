@@ -1,0 +1,24 @@
+name: app_pedidos
+description: Mi primera app conectada a Node.js
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  http: ^1.2.2
+  geolocator: 14.0.2
+  google_maps_flutter: ^2.6.1
+  flutter_dotenv: ^5.0.2 
+  geocoding: ^2.1.0  
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
