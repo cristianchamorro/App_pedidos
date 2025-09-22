@@ -62,7 +62,7 @@ class ApiService {
   }
 
   // ===============================
-  // Agregar producto desde Map (recomendado)
+  // Agregar producto desde Map
   // ===============================
   Future<void> addProductFromMap(Map<String, dynamic> data) async {
     try {
@@ -103,28 +103,28 @@ class ApiService {
       throw Exception('No se pudo conectar al backend: $e');
     }
   }
-  
-// ===============================
-// Actualizar producto
-// ===============================
-Future<void> updateProduct(Product producto) async {
-  try {
-    final url = Uri.parse('$baseUrl/productos/${producto.id}');
-    final response = await http.put(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(producto.toJson()),
-    );
 
-    if (response.statusCode != 200) {
-      final error = jsonDecode(response.body);
-      throw Exception(
-          "Error al actualizar producto: ${response.statusCode} -> ${error['error'] ?? 'Desconocido'}");
+  // ===============================
+  // Actualizar producto
+  // ===============================
+  Future<void> updateProduct(Product producto) async {
+    try {
+      final url = Uri.parse('$baseUrl/productos/${producto.id}');
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(producto.toJson()),
+      );
+
+      if (response.statusCode != 200) {
+        final error = jsonDecode(response.body);
+        throw Exception(
+            "Error al actualizar producto: ${response.statusCode} -> ${error['error'] ?? 'Desconocido'}");
+      }
+    } catch (e) {
+      throw Exception("No se pudo conectar al backend: $e");
     }
-  } catch (e) {
-    throw Exception("No se pudo conectar al backend: $e");
   }
-}
 
   // ===============================
   // Obtener vendors
@@ -140,6 +140,38 @@ Future<void> updateProduct(Product producto) async {
       }
     } catch (e) {
       throw Exception('No se pudo conectar al backend: $e');
+    }
+  }
+
+  // ===============================
+  // 🔑 Login de administrador
+  // ===============================
+  Future<bool> loginAdmin(String username, String password) async {
+    try {
+      final url = Uri.parse('$baseUrl/loginAdmin'); // 🔹 tu endpoint correcto
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "username": username,
+          "password": password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        // Aseguramos que además de success sea admin
+        if (data["success"] == true && data["role"] == "admin") {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } catch (e) {
+      throw Exception("No se pudo conectar al backend: $e");
     }
   }
 }

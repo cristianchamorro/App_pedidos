@@ -9,7 +9,8 @@ import '../models/product.dart';
 import '../pages/productos_por_categoria_page.dart';
 
 class LocationScreen extends StatefulWidget {
-  const LocationScreen({Key? key}) : super(key: key);
+  final String role; // 👈 ahora usamos String para el rol
+  const LocationScreen({Key? key, required this.role}) : super(key: key);
 
   @override
   _LocationScreenState createState() => _LocationScreenState();
@@ -170,18 +171,15 @@ class _LocationScreenState extends State<LocationScreen> {
       final apiService = ApiService();
       List<Product> productos = await apiService.fetchProducts();
 
-      Navigator.push(
+      // ✅ Ahora pasamos el rol como String
+      Navigator.pushNamed(
         context,
-        MaterialPageRoute(
-          builder: (context) => ProductosPorCategoriaPage(
-            productos: productos,
-            direccionEntrega: _address,
-            onAgregarAlPedido: (producto) {
-              print("Producto agregado: ${producto.name}");
-              print("Pedido a entregar en: $_address");
-            },
-          ),
-        ),
+        '/productos',
+        arguments: {
+          'productos': productos,
+          'role': widget.role,
+          'direccion': _address,
+        },
       );
     } catch (e) {
       setState(() {
@@ -224,7 +222,6 @@ class _LocationScreenState extends State<LocationScreen> {
                     ? const CircularProgressIndicator()
                     : Column(
                         children: [
-                          // Solo habilitamos botones en Android/iOS/Web
                           ElevatedButton(
                             onPressed: _isMobileOrWeb ? _getCurrentLocation : null,
                             style: ElevatedButton.styleFrom(

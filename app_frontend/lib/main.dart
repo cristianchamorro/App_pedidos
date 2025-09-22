@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:app_pedidos/screens/location_screen.dart';
 import 'package:app_pedidos/pages/productos_por_categoria_page.dart';
 import 'package:app_pedidos/models/product.dart';
-import 'package:app_pedidos/api_service.dart';
+import 'package:app_pedidos/pages/login_admin_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,24 +19,82 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      home: const LocationScreen(),
+      home: const RoleSelectionScreen(), // ✅ pantalla inicial
       routes: {
-        '/productos': (context) {
-          // Recuperamos los productos pasados como argumento
+        '/location': (context) {
           final args =
-              ModalRoute.of(context)!.settings.arguments as List<Product>;
+              ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          final role = args['role'] as String;
 
-          // Creamos ProductosPorCategoriaPage pasando todos los parámetros obligatorios
+          return LocationScreen(role: role); // ✅ pasamos el rol
+        },
+        '/productos': (context) {
+          final args =
+              ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+          final productos = args['productos'] as List<Product>;
+          final role = args['role'] as String;
+          final direccion = args['direccion'] as String? ?? "Sin dirección";
+
           return ProductosPorCategoriaPage(
-            productos: args,
-            direccionEntrega: "Sin dirección", // Valor temporal
+            productos: productos,
+            direccionEntrega: direccion,
+            role: role, // ✅ ahora sí pasamos el rol
             onAgregarAlPedido: (producto) {
-              // Aquí luego implementarás la lógica real de agregar al pedido
               print("Producto agregado: ${producto.name}");
+              print("Pedido a entregar en: $direccion");
             },
           );
         },
       },
+    );
+  }
+}
+
+/// Pantalla inicial para seleccionar rol
+class RoleSelectionScreen extends StatelessWidget {
+  const RoleSelectionScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Seleccionar Rol"),
+        backgroundColor: Colors.deepPurple,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacementNamed(
+                  context,
+                  '/location',
+                  arguments: {'role': 'user'},
+                );
+              },
+              child: const Text("Ingresar como Usuario"),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // ✅ Ahora primero abre el login de administrador
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LoginAdminPage(),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+              ),
+              child: const Text("Ingresar como Administrador"),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

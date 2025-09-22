@@ -6,12 +6,14 @@ class ProductosPorCategoriaPage extends StatefulWidget {
   final List<Product> productos;
   final String direccionEntrega;
   final void Function(Product)? onAgregarAlPedido;
+  final String role; // ?? Se mantiene como String
 
   const ProductosPorCategoriaPage({
     Key? key,
     required this.productos,
     required this.direccionEntrega,
     this.onAgregarAlPedido,
+    required this.role,
   }) : super(key: key);
 
   @override
@@ -19,13 +21,15 @@ class ProductosPorCategoriaPage extends StatefulWidget {
       _ProductosPorCategoriaPageState();
 }
 
-class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
+class _ProductosPorCategoriaPageState
+    extends State<ProductosPorCategoriaPage> {
   late TextEditingController _direccionController;
 
   @override
   void initState() {
     super.initState();
-    _direccionController = TextEditingController(text: widget.direccionEntrega);
+    _direccionController =
+        TextEditingController(text: widget.direccionEntrega);
   }
 
   @override
@@ -39,9 +43,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
     final Map<String, List<Product>> productosPorCategoria = {};
     for (var producto in widget.productos) {
       final catName = producto.categoryName ?? 'Sin categoría';
-      if (!productosPorCategoria.containsKey(catName)) {
-        productosPorCategoria[catName] = [];
-      }
+      productosPorCategoria.putIfAbsent(catName, () => []);
       productosPorCategoria[catName]!.add(producto);
     }
 
@@ -50,18 +52,19 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
         title: const Text("Selecciona tu producto por categoría"),
         backgroundColor: Colors.deepPurple,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            tooltip: "Agregar Producto",
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AgregarProductoPage(),
-                ),
-              );
-            },
-          ),
+          if (widget.role == "admin") // ? Solo admin ve el botón
+            IconButton(
+              icon: const Icon(Icons.add),
+              tooltip: "Agregar Producto",
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AgregarProductoPage(),
+                  ),
+                );
+              },
+            ),
         ],
       ),
       body: SingleChildScrollView(
@@ -139,7 +142,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                         crossAxisCount: 4,
                         crossAxisSpacing: 8,
                         mainAxisSpacing: 8,
-                        childAspectRatio: 0.85, // ?? más compacto
+                        childAspectRatio: 0.85,
                       ),
                       itemBuilder: (context, index) {
                         final producto = items[index];
@@ -209,7 +212,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                               ),
                             ),
                             child: Column(
-                              mainAxisSize: MainAxisSize.min, // ?? evita estirarse
+                              mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment:
                                   CrossAxisAlignment.stretch,
                               children: [
@@ -219,8 +222,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                           top: Radius.circular(16)),
                                   child: producto.imageUrl != null
                                       ? AspectRatio(
-                                          aspectRatio:
-                                              16 / 9, // ?? imagen compacta
+                                          aspectRatio: 16 / 9,
                                           child: Image.network(
                                             producto.imageUrl!,
                                             fit: BoxFit.cover,
@@ -253,8 +255,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                               color: Colors.black87),
                                           textAlign: TextAlign.center,
                                           maxLines: 2,
-                                          overflow:
-                                              TextOverflow.ellipsis,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       const SizedBox(height: 6),
                                       Text(
