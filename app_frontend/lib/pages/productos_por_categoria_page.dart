@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:app_pedidos/models/product.dart';
-import 'agregar_producto_page.dart'; // <-- Importa tu p¨¢gina de formulario
+import 'agregar_producto_page.dart';
 
 class ProductosPorCategoriaPage extends StatefulWidget {
   final List<Product> productos;
@@ -38,7 +38,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
   Widget build(BuildContext context) {
     final Map<String, List<Product>> productosPorCategoria = {};
     for (var producto in widget.productos) {
-      final catName = producto.categoryName ?? 'Sin categor¨ªa';
+      final catName = producto.categoryName ?? 'Sin categoría';
       if (!productosPorCategoria.containsKey(catName)) {
         productosPorCategoria[catName] = [];
       }
@@ -47,10 +47,9 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Selecciona tu producto por categor¨ªa"),
+        title: const Text("Selecciona tu producto por categoría"),
         backgroundColor: Colors.deepPurple,
         actions: [
-          // ?? Bot¨®n siempre visible
           IconButton(
             icon: const Icon(Icons.add),
             tooltip: "Agregar Producto",
@@ -70,7 +69,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Direcci¨®n editable
+            // Dirección editable
             Card(
               color: Colors.deepPurple.withOpacity(0.1),
               shape: RoundedRectangleBorder(
@@ -104,7 +103,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
               ),
             ),
 
-            // Lista de categor¨ªas y productos
+            // Categorías y productos
             ...productosPorCategoria.entries.map((entry) {
               final categoryName = entry.key;
               final items = entry.value;
@@ -116,9 +115,12 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                 ),
                 child: ExpansionTile(
                   backgroundColor: Colors.deepPurple.withOpacity(0.05),
-                  collapsedBackgroundColor: Colors.deepPurple.withOpacity(0.03),
-                  leading: const Icon(Icons.category, color: Colors.deepPurple),
-                  trailing: const Icon(Icons.keyboard_arrow_down, color: Colors.deepPurple),
+                  collapsedBackgroundColor:
+                      Colors.deepPurple.withOpacity(0.03),
+                  leading:
+                      const Icon(Icons.category, color: Colors.deepPurple),
+                  trailing: const Icon(Icons.keyboard_arrow_down,
+                      color: Colors.deepPurple),
                   title: Text(
                     categoryName,
                     style: const TextStyle(
@@ -132,11 +134,12 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                       physics: const NeverScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(8),
                       itemCount: items.length,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4,
                         crossAxisSpacing: 8,
                         mainAxisSpacing: 8,
-                        childAspectRatio: 0.7,
+                        childAspectRatio: 0.85, // ?? más compacto
                       ),
                       itemBuilder: (context, index) {
                         final producto = items[index];
@@ -150,14 +153,16 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                 ),
                                 title: Text(
                                   producto.name,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     if (producto.imageUrl != null)
                                       ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius:
+                                            BorderRadius.circular(12),
                                         child: Image.network(
                                           producto.imageUrl!,
                                           height: 150,
@@ -175,7 +180,8 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                 actions: [
                                   TextButton(
                                     child: const Text("Cerrar"),
-                                    onPressed: () => Navigator.pop(context),
+                                    onPressed: () =>
+                                        Navigator.pop(context),
                                   ),
                                 ],
                               ),
@@ -194,30 +200,41 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                 ),
                               ],
                               gradient: const LinearGradient(
-                                colors: [Colors.white, Color.fromARGB(30, 103, 58, 183)],
+                                colors: [
+                                  Colors.white,
+                                  Color.fromARGB(30, 103, 58, 183)
+                                ],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                               ),
                             ),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              mainAxisSize: MainAxisSize.min, // ?? evita estirarse
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.stretch,
                               children: [
                                 ClipRRect(
-                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                                  borderRadius:
+                                      const BorderRadius.vertical(
+                                          top: Radius.circular(16)),
                                   child: producto.imageUrl != null
-                                      ? SizedBox(
-                                          height: 160,
+                                      ? AspectRatio(
+                                          aspectRatio:
+                                              16 / 9, // ?? imagen compacta
                                           child: Image.network(
                                             producto.imageUrl!,
                                             fit: BoxFit.cover,
                                           ),
                                         )
-                                      : const Icon(Icons.image_not_supported, size: 50),
+                                      : const Icon(Icons.image_not_supported,
+                                          size: 50),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.all(6.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         producto.name,
@@ -231,10 +248,13 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                       if (producto.description != null)
                                         Text(
                                           producto.description!,
-                                          style: const TextStyle(fontSize: 12, color: Colors.black87),
+                                          style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.black87),
                                           textAlign: TextAlign.center,
                                           maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
+                                          overflow:
+                                              TextOverflow.ellipsis,
                                         ),
                                       const SizedBox(height: 6),
                                       Text(
@@ -248,15 +268,24 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                       SizedBox(
                                         width: double.infinity,
                                         child: ElevatedButton.icon(
-                                          onPressed: widget.onAgregarAlPedido != null
-                                              ? () => widget.onAgregarAlPedido!(producto)
+                                          onPressed: widget
+                                                      .onAgregarAlPedido !=
+                                                  null
+                                              ? () => widget
+                                                  .onAgregarAlPedido!(
+                                                      producto)
                                               : null,
-                                          icon: const Icon(Icons.add_shopping_cart),
+                                          icon: const Icon(
+                                              Icons.add_shopping_cart),
                                           label: const Text("Agregar"),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.deepPurple,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(12),
+                                            backgroundColor:
+                                                Colors.deepPurple,
+                                            shape:
+                                                RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      12),
                                             ),
                                           ),
                                         ),
