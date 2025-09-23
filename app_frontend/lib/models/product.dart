@@ -9,6 +9,8 @@ class Product {
   final int vendorId;
   final String? vendorName;
 
+  int cantidad; // <-- agregado, por defecto 1
+
   Product({
     required this.id,
     required this.name,
@@ -19,6 +21,7 @@ class Product {
     this.categoryName,
     required this.vendorId,
     this.vendorName,
+    this.cantidad = 1, // valor por defecto
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -41,6 +44,7 @@ class Product {
       categoryName: json['category_name'] ?? json['categoryName'],
       vendorId: json['vendor_id'] ?? json['vendorId'] ?? 0,
       vendorName: json['vendor_name'] ?? json['vendorName'],
+      cantidad: json['cantidad'] ?? 1, // <-- se lee también del JSON si viene
     );
   }
 
@@ -55,6 +59,7 @@ class Product {
       'category_name': categoryName,
       'vendor_id': vendorId,
       'vendor_name': vendorName,
+      'cantidad': cantidad, // <-- incluimos cantidad
     };
   }
 }

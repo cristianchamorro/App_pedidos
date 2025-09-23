@@ -1,12 +1,15 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:app_pedidos/models/product.dart';
-import 'agregar_producto_page.dart';
+import 'package:app_pedidos/pages/agregar_producto_page.dart';
+import 'package:app_pedidos/pages/confirmar_pedido_page.dart';
+import 'package:geolocator/geolocator.dart';
 
 class ProductosPorCategoriaPage extends StatefulWidget {
   final List<Product> productos;
   final String direccionEntrega;
   final void Function(Product)? onAgregarAlPedido;
-  final String role; // ?? Se mantiene como String
+  final String role;
 
   const ProductosPorCategoriaPage({
     Key? key,
@@ -21,9 +24,11 @@ class ProductosPorCategoriaPage extends StatefulWidget {
       _ProductosPorCategoriaPageState();
 }
 
-class _ProductosPorCategoriaPageState
-    extends State<ProductosPorCategoriaPage> {
+class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
   late TextEditingController _direccionController;
+
+  List<Product> carrito = [];
+  Map<int, int> cantidadesSeleccionadas = {}; // idProducto -> cantidad
 
   @override
   void initState() {
@@ -38,6 +43,60 @@ class _ProductosPorCategoriaPageState
     super.dispose();
   }
 
+  Future<Position> obtenerUbicacion() async {
+    bool servicioActivo = await Geolocator.isLocationServiceEnabled();
+    if (!servicioActivo) throw 'El GPS está desactivado';
+
+    LocationPermission permiso = await Geolocator.checkPermission();
+    if (permiso == LocationPermission.denied) {
+      permiso = await Geolocator.requestPermission();
+      if (permiso == LocationPermission.denied) {
+        throw 'Permiso de ubicación denegado';
+      }
+    }
+
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+  }
+
+  void abrirConfirmarPedido() async {
+    if (carrito.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No hay productos en el carrito")),
+      );
+      return;
+    }
+
+    Position posicion;
+    try {
+      posicion = await obtenerUbicacion();
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error ubicación: $e')));
+      return;
+    }
+
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ConfirmarPedidoPage(
+          carrito: carrito,
+          direccionEntrega: _direccionController.text,
+          ubicacion: {'lat': posicion.latitude, 'lng': posicion.longitude},
+        ),
+      ),
+    );
+
+    if (result != null && result['success'] == true) {
+      setState(() {
+        carrito.clear();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Pedido confirmado correctamente")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Map<String, List<Product>> productosPorCategoria = {};
@@ -49,10 +108,11 @@ class _ProductosPorCategoriaPageState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Selecciona tu producto por categoría"),
+        title: const Text(
+            "Selección de productos a ingresar al pedido por categoría"),
         backgroundColor: Colors.deepPurple,
         actions: [
-          if (widget.role == "admin") // ? Solo admin ve el botón
+          if (widget.role == "admin")
             IconButton(
               icon: const Icon(Icons.add),
               tooltip: "Agregar Producto",
@@ -106,10 +166,11 @@ class _ProductosPorCategoriaPageState
               ),
             ),
 
-            // Categorías y productos
+            // Productos por categoría
             ...productosPorCategoria.entries.map((entry) {
               final categoryName = entry.key;
               final items = entry.value;
+
               return Card(
                 elevation: 4,
                 margin: const EdgeInsets.symmetric(vertical: 6),
@@ -120,8 +181,7 @@ class _ProductosPorCategoriaPageState
                   backgroundColor: Colors.deepPurple.withOpacity(0.05),
                   collapsedBackgroundColor:
                       Colors.deepPurple.withOpacity(0.03),
-                  leading:
-                      const Icon(Icons.category, color: Colors.deepPurple),
+                  leading: const Icon(Icons.category, color: Colors.deepPurple),
                   trailing: const Icon(Icons.keyboard_arrow_down,
                       color: Colors.deepPurple),
                   title: Text(
@@ -146,50 +206,11 @@ class _ProductosPorCategoriaPageState
                       ),
                       itemBuilder: (context, index) {
                         final producto = items[index];
+                        final cantidadActual =
+                            cantidadesSeleccionadas[producto.id] ?? 1;
+
                         return GestureDetector(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                title: Text(
-                                  producto.name,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    if (producto.imageUrl != null)
-                                      ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(12),
-                                        child: Image.network(
-                                          producto.imageUrl!,
-                                          height: 150,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    const SizedBox(height: 12),
-                                    if (producto.description != null)
-                                      Text(
-                                        producto.description!,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                  ],
-                                ),
-                                actions: [
-                                  TextButton(
-                                    child: const Text("Cerrar"),
-                                    onPressed: () =>
-                                        Navigator.pop(context),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
+                          onTap: () {},
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             curve: Curves.easeInOut,
@@ -213,13 +234,11 @@ class _ProductosPorCategoriaPageState
                             ),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 ClipRRect(
-                                  borderRadius:
-                                      const BorderRadius.vertical(
-                                          top: Radius.circular(16)),
+                                  borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(16)),
                                   child: producto.imageUrl != null
                                       ? AspectRatio(
                                           aspectRatio: 16 / 9,
@@ -247,17 +266,6 @@ class _ProductosPorCategoriaPageState
                                         textAlign: TextAlign.center,
                                       ),
                                       const SizedBox(height: 4),
-                                      if (producto.description != null)
-                                        Text(
-                                          producto.description!,
-                                          style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.black87),
-                                          textAlign: TextAlign.center,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      const SizedBox(height: 6),
                                       Text(
                                         "\$${producto.price.toStringAsFixed(2)}",
                                         style: const TextStyle(
@@ -266,27 +274,87 @@ class _ProductosPorCategoriaPageState
                                         ),
                                       ),
                                       const SizedBox(height: 6),
+
+                                      // Selector de cantidad
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          IconButton(
+                                            icon:
+                                                const Icon(Icons.remove, size: 20),
+                                            onPressed: () {
+                                              setState(() {
+                                                cantidadesSeleccionadas[
+                                                        producto.id] =
+                                                    (cantidadesSeleccionadas[
+                                                                producto.id] ??
+                                                            1) -
+                                                        1;
+                                                if (cantidadesSeleccionadas[
+                                                        producto.id]! <
+                                                    1) {
+                                                  cantidadesSeleccionadas[
+                                                      producto.id] = 1;
+                                                }
+                                              });
+                                            },
+                                          ),
+                                          Text(
+                                            '$cantidadActual',
+                                            style:
+                                                const TextStyle(fontSize: 16),
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.add, size: 20),
+                                            onPressed: () {
+                                              setState(() {
+                                                cantidadesSeleccionadas[
+                                                        producto.id] =
+                                                    (cantidadesSeleccionadas[
+                                                                producto.id] ??
+                                                            1) +
+                                                        1;
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      ),
+
+                                      const SizedBox(height: 6),
                                       SizedBox(
                                         width: double.infinity,
                                         child: ElevatedButton.icon(
-                                          onPressed: widget
-                                                      .onAgregarAlPedido !=
-                                                  null
-                                              ? () => widget
-                                                  .onAgregarAlPedido!(
-                                                      producto)
-                                              : null,
-                                          icon: const Icon(
-                                              Icons.add_shopping_cart),
+                                          onPressed: () {
+                                            final cantidad = cantidadesSeleccionadas[
+                                                    producto.id] ??
+                                                1;
+
+                                            // Guardamos la cantidad en el producto (agregar campo 'cantidad' en Product)
+                                            producto.cantidad = cantidad;
+
+                                            if (widget.onAgregarAlPedido !=
+                                                null) {
+                                              widget.onAgregarAlPedido!(producto);
+                                            }
+                                            setState(() {
+                                              carrito.add(producto);
+                                            });
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    '${producto.name} agregado al pedido (x$cantidad)'),
+                                              ),
+                                            );
+                                          },
+                                          icon: const Icon(Icons.add_shopping_cart),
                                           label: const Text("Agregar"),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                Colors.deepPurple,
-                                            shape:
-                                                RoundedRectangleBorder(
+                                            backgroundColor: Colors.deepPurple,
+                                            shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(
-                                                      12),
+                                                  BorderRadius.circular(12),
                                             ),
                                           ),
                                         ),
@@ -306,6 +374,12 @@ class _ProductosPorCategoriaPageState
             }).toList(),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: abrirConfirmarPedido,
+        icon: const Icon(Icons.check),
+        label: const Text('Confirmar Pedido'),
+        backgroundColor: Colors.deepPurple,
       ),
     );
   }
