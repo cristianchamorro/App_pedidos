@@ -1,14 +1,15 @@
-import 'dart:convert';
+// confirmar_pedido_page.dart
 import 'package:flutter/material.dart';
 import 'package:app_pedidos/models/product.dart';
 import 'package:http/http.dart' as http;
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
+
 
 class ConfirmarPedidoPage extends StatefulWidget {
   final List<Product> carrito;
   final String direccionEntrega;
-  final Map<String, double> ubicacion;
+  final Map<String, double> ubicacion; // lat/lng
 
   const ConfirmarPedidoPage({
     Key? key,
@@ -26,7 +27,6 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
   late TextEditingController _telefonoController;
   late TextEditingController _direccionController;
   bool _isLoading = false;
-  bool _pedidoConfirmado = false;
 
   @override
   void initState() {
@@ -46,8 +46,8 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
 
   double get totalPedido {
     double total = 0;
-    for (var producto in widget.carrito) {
-      total += producto.price * (producto.cantidad ?? 1);
+    for (var p in widget.carrito) {
+      total += (p.price * (p.cantidad ?? 1));
     }
     return total;
   }
@@ -74,8 +74,6 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
         "productos": widget.carrito
             .map((p) => {
                   "id": p.id,
-                  "nombre": p.name,
-                  "vendedor": p.vendorName ?? '',
                   "cantidad": p.cantidad ?? 1,
                   "price": p.price,
                 })
@@ -95,12 +93,11 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Pedido confirmado correctamente")),
         );
-        setState(() => _pedidoConfirmado = true);
+        Navigator.pop(context, data); // Devuelve info al carrito si quieres
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:
-                Text("Error al confirmar pedido: ${data['error'] ?? 'Desconocido'}"),
+            content: Text("Error al confirmar pedido: ${data['error'] ?? 'Desconocido'}"),
           ),
         );
       }
@@ -110,36 +107,6 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
       );
     } finally {
       setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> enviarWhatsApp() async {
-    final nombre = _nombreController.text.trim();
-    final telefono = _telefonoController.text.trim();
-    final direccion = _direccionController.text.trim();
-
-    String mensaje = "📦 *Nuevo pedido*\n";
-    mensaje += "Nombre: $nombre\n";
-    mensaje += "Teléfono: $telefono\n";
-    mensaje += "Dirección: $direccion\n\n";
-    mensaje += "🛒 *Productos:*\n";
-
-    for (var p in widget.carrito) {
-      mensaje +=
-          "- ${p.name} (${p.vendorName ?? 'Sin vendedor'})\n  Cantidad: ${p.cantidad ?? 1}, Precio unitario: \$${p.price.toStringAsFixed(2)}\n";
-    }
-
-    mensaje += "\n💰 Total: \$${totalPedido.toStringAsFixed(2)}";
-
-    final whatsappUrl = Uri.parse(
-        "https://wa.me/573106812608?text=${Uri.encodeComponent(mensaje)}"); // Cambia el número por tu WhatsApp
-
-    if (await canLaunchUrl(whatsappUrl)) {
-      await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("No se pudo abrir WhatsApp")),
-      );
     }
   }
 
@@ -155,7 +122,6 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Nombre
             TextField(
               controller: _nombreController,
               decoration: const InputDecoration(
@@ -164,8 +130,6 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
               ),
             ),
             const SizedBox(height: 12),
-
-            // Teléfono
             TextField(
               controller: _telefonoController,
               keyboardType: TextInputType.phone,
@@ -175,8 +139,6 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
               ),
             ),
             const SizedBox(height: 12),
-
-            // Dirección
             TextField(
               controller: _direccionController,
               maxLines: 2,
@@ -186,41 +148,30 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Resumen del pedido
             const Text(
               "Resumen del pedido",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: widget.carrito.length,
               itemBuilder: (context, index) {
-                final producto = widget.carrito[index];
+                final p = widget.carrito[index];
                 return ListTile(
-                  title: Text(producto.name),
-                  subtitle: Text(
-                      'Cantidad: ${producto.cantidad ?? 1}, Vendedor: ${producto.vendorName ?? 'Sin vendedor'}'),
-                  trailing: Text(
-                      "\$${(producto.price * (producto.cantidad ?? 1)).toStringAsFixed(2)}"),
+                  title: Text(p.name),
+                  subtitle: Text('Cantidad: ${p.cantidad ?? 1}'),
+                  trailing: Text("\$${(p.price * (p.cantidad ?? 1)).toStringAsFixed(2)}"),
                 );
               },
             ),
             const SizedBox(height: 12),
-
             Text(
               "Total: \$${totalPedido.toStringAsFixed(2)}",
-              style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
             ),
             const SizedBox(height: 20),
-
-            // Botón Confirmar
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -228,32 +179,11 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text(
-                        "Confirmar Pedido",
-                        style: TextStyle(fontSize: 16),
-                      ),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Botón WhatsApp
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _pedidoConfirmado ? enviarWhatsApp : null,
-                icon: const FaIcon(FontAwesomeIcons.whatsapp),
-                label: const Text("Enviar pedido a WhatsApp"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
+                    : const Text("Confirmar Pedido", style: TextStyle(fontSize: 16)),
               ),
             ),
           ],
