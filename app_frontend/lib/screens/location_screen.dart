@@ -6,10 +6,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import '../api_service.dart';
 import '../models/product.dart';
-import '../pages/productos_por_categoria_page.dart';
 
 class LocationScreen extends StatefulWidget {
-  final String role; // 👈 ahora usamos String para el rol
+  final String role;
   const LocationScreen({Key? key, required this.role}) : super(key: key);
 
   @override
@@ -25,17 +24,19 @@ class _LocationScreenState extends State<LocationScreen> {
   final TextEditingController _manualAddressController =
       TextEditingController();
 
-  bool get _isMobileOrWeb =>
-      Platform.isAndroid || Platform.isIOS || kIsWeb || Platform.isMacOS;
+  bool get _isMobileOrDesktop =>
+      !kIsWeb && (Platform.isAndroid || Platform.isIOS || Platform.isWindows || Platform.isMacOS);
+
+  bool get _isWeb => kIsWeb;
 
   @override
   void initState() {
     super.initState();
-    if (_isMobileOrWeb) {
+    if (_isMobileOrDesktop) {
       _getCurrentLocation();
     } else {
-      // Windows / Linux → deshabilitamos ubicación
-      _address = "Selecciona en el mapa o escribe tu dirección.";
+      // Web → solo escribimos la dirección
+      _address = "Ingresa tu dirección manualmente.";
     }
   }
 
@@ -171,7 +172,6 @@ class _LocationScreenState extends State<LocationScreen> {
       final apiService = ApiService();
       List<Product> productos = await apiService.fetchProducts();
 
-      // ✅ Ahora pasamos el rol como String
       Navigator.pushNamed(
         context,
         '/productos',
@@ -212,54 +212,54 @@ class _LocationScreenState extends State<LocationScreen> {
                   style: const TextStyle(fontSize: 18),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 12),
-                _locationConfirmed
-                    ? const Icon(Icons.check_circle,
-                        color: Colors.green, size: 40)
-                    : const SizedBox.shrink(),
                 const SizedBox(height: 20),
-                _loading
-                    ? const CircularProgressIndicator()
-                    : Column(
-                        children: [
-                          ElevatedButton(
-                            onPressed: _isMobileOrWeb ? _getCurrentLocation : null,
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.deepPurple),
-                            child: const Text("Usar mi ubicación actual"),
-                          ),
-                          const SizedBox(height: 10),
-                          ElevatedButton(
-                            onPressed: _isMobileOrWeb ? _openMapModal : null,
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.deepPurple),
-                            child: const Text("Seleccionar en el mapa"),
-                          ),
-                          const SizedBox(height: 20),
-                          TextField(
-                            controller: _manualAddressController,
-                            decoration: const InputDecoration(
-                              labelText: "Escribe dirección o coordenadas",
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          ElevatedButton(
-                            onPressed: _useManualAddress,
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.deepPurple),
-                            child: const Text("Usar dirección escrita"),
-                          ),
-                          const SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed:
-                                _locationConfirmed ? _continueToProducts : null,
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.deepPurple),
-                            child: const Text("Continuar"),
-                          ),
-                        ],
+
+                // SOLO mostrar botones de ubicación si NO es Web
+                if (_isMobileOrDesktop)
+                  Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: _getCurrentLocation,
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple),
+                        child: const Text("Usar mi ubicación actual"),
                       ),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: _openMapModal,
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple),
+                        child: const Text("Seleccionar en el mapa"),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+
+                TextField(
+                  controller: _manualAddressController,
+                  decoration: const InputDecoration(
+                    labelText: "Escribe dirección",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: _useManualAddress,
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple),
+                  child: const Text("Usar dirección escrita"),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _locationConfirmed ? _continueToProducts : null,
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple),
+                  child: _loading
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : const Text("Continuar"),
+                ),
               ],
             ),
           ),
