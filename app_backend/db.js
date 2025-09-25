@@ -1,13 +1,19 @@
 // db.js
 const { Pool } = require('pg');
 
-// Configura con tus credenciales de Postgres
+/// -----------------------------
+// Configuración de PostgreSQL
+// -----------------------------
 const pool = new Pool({
-  user: 'tu_usuario',
-  host: 'localhost',  // o la IP del servidor donde esté Postgres
-  database: 'nombre_base_datos',
-  password: 'tu_password',
-  port: 5432, // puerto por defecto de Postgres
+  user: 'postgres',
+  host: 'localhost',
+  database: 'Bd_App',
+  password: 'root',
+  port: 5432,
 });
+
+pool.connect()
+  .then(() => console.log('Conectado a PostgreSQL ✅'))
+  .catch(err => console.error('Error conectando a PostgreSQL ❌', err));
 
 module.exports = pool;

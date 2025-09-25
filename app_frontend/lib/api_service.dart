@@ -44,7 +44,7 @@ class ApiService {
   // ===============================
   Future<void> addProduct(Product producto) async {
     try {
-      final url = Uri.parse('$baseUrl/productos');
+      final url = Uri.parse('$baseUrl/admin/products');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -66,7 +66,7 @@ class ApiService {
   // ===============================
   Future<void> addProductFromMap(Map<String, dynamic> data) async {
     try {
-      final url = Uri.parse('$baseUrl/productos');
+     final url = Uri.parse('$baseUrl/admin/products');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -88,28 +88,11 @@ class ApiService {
   }
 
   // ===============================
-  // Obtener categorías
-  // ===============================
-  Future<List<Categoria>> fetchCategorias() async {
-    try {
-      final response = await http.get(Uri.parse('$baseUrl/categorias'));
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        return data.map((cat) => Categoria.fromJson(cat)).toList();
-      } else {
-        throw Exception('Error al cargar categorías: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('No se pudo conectar al backend: $e');
-    }
-  }
-
-  // ===============================
   // Actualizar producto
   // ===============================
   Future<void> updateProduct(Product producto) async {
     try {
-      final url = Uri.parse('$baseUrl/productos/${producto.id}');
+      final url = Uri.parse('$baseUrl/admin/products/${producto.id}');
       final response = await http.put(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -126,29 +109,46 @@ class ApiService {
     }
   }
 
-  // ===============================
-  // Obtener vendors
-  // ===============================
-  Future<List<Vendor>> fetchVendors() async {
-    try {
-      final response = await http.get(Uri.parse('$baseUrl/vendors'));
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        return data.map((v) => Vendor.fromJson(v)).toList();
-      } else {
-        throw Exception('Error al cargar vendors: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('No se pudo conectar al backend: $e');
+ // ===============================
+// Obtener categorías
+// ===============================
+Future<List<Categoria>> fetchCategorias() async {
+  try {
+    final response = await http.get(Uri.parse('$baseUrl/admin/categories'));
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((cat) => Categoria.fromJson(cat)).toList();
+    } else {
+      throw Exception('Error al cargar categorías: ${response.statusCode}');
     }
+  } catch (e) {
+    throw Exception('No se pudo conectar al backend: $e');
   }
+}
+
+// ===============================
+// Obtener vendors
+// ===============================
+Future<List<Vendor>> fetchVendors() async {
+  try {
+    final response = await http.get(Uri.parse('$baseUrl/admin/vendors'));
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((v) => Vendor.fromJson(v)).toList();
+    } else {
+      throw Exception('Error al cargar vendors: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('No se pudo conectar al backend: $e');
+  }
+}
 
   // ===============================
   // 🔑 Login de administrador
   // ===============================
   Future<bool> loginAdmin(String username, String password) async {
     try {
-      final url = Uri.parse('$baseUrl/loginAdmin'); // 🔹 tu endpoint correcto
+      final url = Uri.parse('$baseUrl/loginAdmin'); 
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
@@ -160,13 +160,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-
-        // Aseguramos que además de success sea admin
-        if (data["success"] == true && data["role"] == "admin") {
-          return true;
-        } else {
-          return false;
-        }
+        return data["success"] == true;
       } else {
         return false;
       }
@@ -174,4 +168,5 @@ class ApiService {
       throw Exception("No se pudo conectar al backend: $e");
     }
   }
-}
+} // <-- Este cierre es crucial para la clase ApiService
+
