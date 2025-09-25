@@ -25,6 +25,11 @@ class Product {
     this.driverName, // <-- incluimos en el constructor
     this.cantidad = 1,
   });
+  
+  
+  void resetCantidad() {   
+    cantidad = 1; // o 0, según prefieras mostrar   // 🔴 Método para resetear cantidad
+  }
 
   factory Product.fromJson(Map<String, dynamic> json) {
     double parsedPrice = 0.0;

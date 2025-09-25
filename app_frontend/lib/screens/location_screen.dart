@@ -25,7 +25,8 @@ class _LocationScreenState extends State<LocationScreen> {
       TextEditingController();
 
   bool get _isMobileOrDesktop =>
-      !kIsWeb && (Platform.isAndroid || Platform.isIOS || Platform.isWindows || Platform.isMacOS);
+      !kIsWeb &&
+      (Platform.isAndroid || Platform.isIOS || Platform.isWindows || Platform.isMacOS);
 
   bool get _isWeb => kIsWeb;
 
@@ -103,6 +104,14 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   Future<void> _openMapModal() async {
+    if (_isWeb) {
+      // 🚫 No intentar abrir GoogleMap en Web
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("El mapa no está disponible en versión Web")),
+      );
+      return;
+    }
+
     LatLng initialPosition =
         _selectedLocation ?? const LatLng(4.710989, -74.072090); // Bogotá
     LatLng? pickedLocation = await showDialog<LatLng>(
@@ -235,6 +244,7 @@ class _LocationScreenState extends State<LocationScreen> {
                     ],
                   ),
 
+                // ✅ Siempre disponible en todas las plataformas
                 TextField(
                   controller: _manualAddressController,
                   decoration: const InputDecoration(

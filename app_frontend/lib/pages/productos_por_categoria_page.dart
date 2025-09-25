@@ -26,15 +26,13 @@ class ProductosPorCategoriaPage extends StatefulWidget {
 
 class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
   late TextEditingController _direccionController;
-
   List<Product> carrito = [];
   Map<int, int> cantidadesSeleccionadas = {}; // idProducto -> cantidad
 
   @override
   void initState() {
     super.initState();
-    _direccionController =
-        TextEditingController(text: widget.direccionEntrega);
+    _direccionController = TextEditingController(text: widget.direccionEntrega);
   }
 
   @override
@@ -95,6 +93,39 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
         const SnackBar(content: Text("Pedido confirmado correctamente")),
       );
     }
+  }
+
+  void mostrarDetalleProducto(Product producto) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(producto.name),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (producto.imageUrl != null)
+              Image.network(
+                producto.imageUrl!,
+                height: 150,
+                fit: BoxFit.cover,
+              )
+            else
+              const Icon(Icons.image_not_supported, size: 80),
+            const SizedBox(height: 12),
+            Text(
+              producto.description ?? "Sin descripción",
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cerrar"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -210,7 +241,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                             cantidadesSeleccionadas[producto.id] ?? 1;
 
                         return GestureDetector(
-                          onTap: () {},
+                          onTap: () => mostrarDetalleProducto(producto),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             curve: Curves.easeInOut,
@@ -289,8 +320,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                                         producto.id] =
                                                     (cantidadesSeleccionadas[
                                                                 producto.id] ??
-                                                            1) -
-                                                        1;
+                                                            1) - 1;
                                                 if (cantidadesSeleccionadas[
                                                         producto.id]! <
                                                     1) {
@@ -330,23 +360,41 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                                     producto.id] ??
                                                 1;
 
-                                            // Guardamos la cantidad en el producto (agregar campo 'cantidad' en Product)
-                                            producto.cantidad = cantidad;
+                                            // Verificar si el producto ya está en el carrito
+                                            final indexExistente = carrito.indexWhere(
+                                                (p) => p.id == producto.id);
 
-                                            if (widget.onAgregarAlPedido !=
-                                                null) {
-                                              widget.onAgregarAlPedido!(producto);
+                                            if (indexExistente >= 0) {
+                                              // Si ya existe, actualizar la cantidad
+                                              setState(() {
+                                                carrito[indexExistente].cantidad =
+                                                    (carrito[indexExistente].cantidad ?? 1) +
+                                                        cantidad;
+                                              });
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                      'Cantidad de ${producto.name} actualizada a x${carrito[indexExistente].cantidad}'),
+                                                ),
+                                              );
+                                            } else {
+                                              // Si no existe, agregar nuevo producto
+                                              setState(() {
+                                                producto.cantidad = cantidad;
+                                                carrito.add(producto);
+                                              });
+                                              if (widget.onAgregarAlPedido != null) {
+                                                widget.onAgregarAlPedido!(producto);
+                                              }
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                      '${producto.name} agregado al pedido (x$cantidad)'),
+                                                ),
+                                              );
                                             }
-                                            setState(() {
-                                              carrito.add(producto);
-                                            });
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                    '${producto.name} agregado al pedido (x$cantidad)'),
-                                              ),
-                                            );
                                           },
                                           icon: const Icon(Icons.add_shopping_cart),
                                           label: const Text("Agregar"),

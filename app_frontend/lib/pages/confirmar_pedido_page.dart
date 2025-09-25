@@ -39,6 +39,7 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
 
   @override
   void dispose() {
+    // ❌ Quitamos Navigator.pop() de aquí
     _nombreController.dispose();
     _telefonoController.dispose();
     _direccionController.dispose();
@@ -97,7 +98,19 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Pedido confirmado correctamente")),
         );
-        setState(() => _pedidoConfirmado = true);
+
+        setState(() {
+          _pedidoConfirmado = true;
+
+          // 🔵 Limpiar cantidades, carrito y formularios
+          for (var p in widget.carrito) {
+            p.resetCantidad();
+          }
+          widget.carrito.clear();
+          _nombreController.clear();
+          _telefonoController.clear();
+          _direccionController.clear();
+        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -122,7 +135,8 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
     mensaje += "Nombre: ${_nombreController.text}\n";
     mensaje += "Teléfono: ${_telefonoController.text}\n";
     mensaje += "Dirección: ${_direccionController.text}\n";
-    mensaje += "Ubicación: lat ${widget.ubicacion['lat']}, lng ${widget.ubicacion['lng']}\n\n";
+    mensaje +=
+        "Ubicación: lat ${widget.ubicacion['lat']}, lng ${widget.ubicacion['lng']}\n\n";
     mensaje += "*Productos:*\n";
 
     for (var p in widget.carrito) {
@@ -139,8 +153,8 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
 
-      // Limpia todo y regresa a pantalla de selección de productos
-      Navigator.pop(context); // Volvemos al carrito/productos
+      // ✅ Ahora sí volvemos a la pantalla anterior
+      Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("No se pudo abrir WhatsApp")),
@@ -192,25 +206,47 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
             ),
             const SizedBox(height: 8),
             ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: widget.carrito.length,
-              itemBuilder: (context, index) {
-                final producto = widget.carrito[index];
-                return ListTile(
-                  title: Text(producto.name),
-                  subtitle: Text(
-                      'Cantidad: ${producto.cantidad ?? 1} | Vendedor: ${producto.vendorName ?? 'N/A'} | Driver: ${producto.driverName ?? 'N/A'}'),
-                  trailing: Text(
-                      "\$${(producto.price * (producto.cantidad ?? 1)).toStringAsFixed(2)}"),
-                );
-              },
-            ),
+			shrinkWrap: true,
+			physics: const NeverScrollableScrollPhysics(),
+			itemCount: widget.carrito.length,
+			itemBuilder: (context, index) {
+				final producto = widget.carrito[index];
+				return ListTile(
+			leading: producto.imageUrl != null
+			? Image.network(producto.imageUrl!, width: 40, height: 40, fit: BoxFit.cover)
+			: const Icon(Icons.shopping_bag, color: Colors.deepPurple),
+				title: Text(producto.name),
+				subtitle: Text(
+					'Cantidad: ${producto.cantidad} | Vendedor: ${producto.vendorName ?? 'N/A'} | Driver: ${producto.driverName ?? 'N/A'}',
+				),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            "\$${(producto.price * producto.cantidad).toStringAsFixed(2)}",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () {
+              setState(() {
+                widget.carrito.removeAt(index);
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  },
+),
+
             const SizedBox(height: 12),
             Text(
               "Total: \$${totalPedido.toStringAsFixed(2)}",
               style: const TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green),
             ),
             const SizedBox(height: 20),
             SizedBox(
