@@ -43,13 +43,13 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
 
   Future<Position> obtenerUbicacion() async {
     bool servicioActivo = await Geolocator.isLocationServiceEnabled();
-    if (!servicioActivo) throw 'El GPS est· desactivado';
+    if (!servicioActivo) throw 'El GPS estÔøΩ desactivado';
 
     LocationPermission permiso = await Geolocator.checkPermission();
     if (permiso == LocationPermission.denied) {
       permiso = await Geolocator.requestPermission();
       if (permiso == LocationPermission.denied) {
-        throw 'Permiso de ubicaciÛn denegado';
+        throw 'Permiso de ubicaciÔøΩn denegado';
       }
     }
 
@@ -58,6 +58,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
   }
 
   void abrirConfirmarPedido() async {
+    // 1Ô∏è‚É£ Validar que haya productos en el carrito
     if (carrito.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("No hay productos en el carrito")),
@@ -65,15 +66,17 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
       return;
     }
 
+    // 2Ô∏è‚É£ Obtener la ubicaci√≥n del usuario
     Position posicion;
     try {
       posicion = await obtenerUbicacion();
     } catch (e) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error ubicaciÛn: $e')));
+          .showSnackBar(SnackBar(content: Text('Error ubicaci√≥n: $e')));
       return;
     }
 
+    // 3Ô∏è‚É£ Navegar a la p√°gina de Confirmar Pedido
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -85,10 +88,17 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
       ),
     );
 
+    // 4Ô∏è‚É£ Si el pedido se confirma correctamente
     if (result != null && result['success'] == true) {
       setState(() {
+        // Limpiar el carrito
         carrito.clear();
+
+        // üîπ Resetear cantidades seleccionadas a 1
+        cantidadesSeleccionadas.clear();
       });
+
+      // 5Ô∏è‚É£ Mostrar notificaci√≥n de confirmaci√≥n
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Pedido confirmado correctamente")),
       );
@@ -113,7 +123,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
               const Icon(Icons.image_not_supported, size: 80),
             const SizedBox(height: 12),
             Text(
-              producto.description ?? "Sin descripciÛn",
+              producto.description ?? "Sin descripciÔøΩn",
               textAlign: TextAlign.center,
             ),
           ],
@@ -132,7 +142,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
   Widget build(BuildContext context) {
     final Map<String, List<Product>> productosPorCategoria = {};
     for (var producto in widget.productos) {
-      final catName = producto.categoryName ?? 'Sin categorÌa';
+      final catName = producto.categoryName ?? 'Sin categorÔøΩa';
       productosPorCategoria.putIfAbsent(catName, () => []);
       productosPorCategoria[catName]!.add(producto);
     }
@@ -140,7 +150,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-            "SelecciÛn de productos a ingresar al pedido por categorÌa"),
+            "SelecciÔøΩn de productos a ingresar al pedido por categorÔøΩa"),
         backgroundColor: Colors.deepPurple,
         actions: [
           if (widget.role == "admin")
@@ -163,7 +173,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // DirecciÛn editable
+            // DirecciÔøΩn editable
             Card(
               color: Colors.deepPurple.withOpacity(0.1),
               shape: RoundedRectangleBorder(
@@ -197,7 +207,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
               ),
             ),
 
-            // Productos por categorÌa
+            // Productos por categorÔøΩa
             ...productosPorCategoria.entries.map((entry) {
               final categoryName = entry.key;
               final items = entry.value;
@@ -211,7 +221,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                 child: ExpansionTile(
                   backgroundColor: Colors.deepPurple.withOpacity(0.05),
                   collapsedBackgroundColor:
-                      Colors.deepPurple.withOpacity(0.03),
+                  Colors.deepPurple.withOpacity(0.03),
                   leading: const Icon(Icons.category, color: Colors.deepPurple),
                   trailing: const Icon(Icons.keyboard_arrow_down,
                       color: Colors.deepPurple),
@@ -229,7 +239,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                       padding: const EdgeInsets.all(8),
                       itemCount: items.length,
                       gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
+                      const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4,
                         crossAxisSpacing: 8,
                         mainAxisSpacing: 8,
@@ -272,21 +282,21 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                       top: Radius.circular(16)),
                                   child: producto.imageUrl != null
                                       ? AspectRatio(
-                                          aspectRatio: 16 / 9,
-                                          child: Image.network(
-                                            producto.imageUrl!,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        )
+                                    aspectRatio: 16 / 9,
+                                    child: Image.network(
+                                      producto.imageUrl!,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
                                       : const Icon(Icons.image_not_supported,
-                                          size: 50),
+                                      size: 50),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.all(6.0),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         producto.name,
@@ -309,23 +319,23 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                       // Selector de cantidad
                                       Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        MainAxisAlignment.center,
                                         children: [
                                           IconButton(
                                             icon:
-                                                const Icon(Icons.remove, size: 20),
+                                            const Icon(Icons.remove, size: 20),
                                             onPressed: () {
                                               setState(() {
                                                 cantidadesSeleccionadas[
-                                                        producto.id] =
+                                                producto.id] =
                                                     (cantidadesSeleccionadas[
-                                                                producto.id] ??
-                                                            1) - 1;
+                                                    producto.id] ??
+                                                        1) - 1;
                                                 if (cantidadesSeleccionadas[
-                                                        producto.id]! <
+                                                producto.id]! <
                                                     1) {
                                                   cantidadesSeleccionadas[
-                                                      producto.id] = 1;
+                                                  producto.id] = 1;
                                                 }
                                               });
                                             },
@@ -333,17 +343,17 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                           Text(
                                             '$cantidadActual',
                                             style:
-                                                const TextStyle(fontSize: 16),
+                                            const TextStyle(fontSize: 16),
                                           ),
                                           IconButton(
                                             icon: const Icon(Icons.add, size: 20),
                                             onPressed: () {
                                               setState(() {
                                                 cantidadesSeleccionadas[
-                                                        producto.id] =
+                                                producto.id] =
                                                     (cantidadesSeleccionadas[
-                                                                producto.id] ??
-                                                            1) +
+                                                    producto.id] ??
+                                                        1) +
                                                         1;
                                               });
                                             },
@@ -357,19 +367,17 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                         child: ElevatedButton.icon(
                                           onPressed: () {
                                             final cantidad = cantidadesSeleccionadas[
-                                                    producto.id] ??
+                                            producto.id] ??
                                                 1;
 
-                                            // Verificar si el producto ya est· en el carrito
+                                            // Verificar si el producto ya estÔøΩ en el carrito
                                             final indexExistente = carrito.indexWhere(
-                                                (p) => p.id == producto.id);
+                                                    (p) => p.id == producto.id);
 
                                             if (indexExistente >= 0) {
                                               // Si ya existe, actualizar la cantidad
                                               setState(() {
-                                                carrito[indexExistente].cantidad =
-                                                    (carrito[indexExistente].cantidad ?? 1) +
-                                                        cantidad;
+                                                carrito[indexExistente].cantidad =cantidad;
                                               });
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
@@ -402,7 +410,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                             backgroundColor: Colors.deepPurple,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(12),
+                                              BorderRadius.circular(12),
                                             ),
                                           ),
                                         ),
