@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../api_service.dart';
-import 'detalle_pedido_page.dart'; // ⬅️ Importamos la nueva pantalla
+import 'detalle_pedido_page.dart';
+import 'pago_page.dart'; // ⬅️ Importamos la pantalla de pago
 
 class PedidosCajeroPage extends StatefulWidget {
   const PedidosCajeroPage({Key? key}) : super(key: key);
@@ -17,24 +18,6 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
   void initState() {
     super.initState();
     _pedidosPendientes = api.fetchPedidosPendientes();
-  }
-
-  Future<void> _procesarPedido(int orderId) async {
-    try {
-      final success = await api.procesarPedido(orderId);
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Pedido procesado correctamente")),
-        );
-        setState(() {
-          _pedidosPendientes = api.fetchPedidosPendientes();
-        });
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error al procesar pedido: $e")),
-      );
-    }
   }
 
   @override
@@ -68,12 +51,30 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                     "Tel: ${pedido['cliente_telefono']}\nDirección: ${pedido['direccion_entrega']}",
                   ),
                   trailing: ElevatedButton(
-                    onPressed: () => _procesarPedido(pedido['order_id']),
+                    onPressed: () async {
+                      // Abrir pantalla de pago
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PagoPage(
+                            pedidoId: pedido['order_id'],
+                            total: double.tryParse(pedido['total'].toString()) ?? 0.0,
+                          ),
+                        ),
+                      );
+
+                      // Si el pago fue confirmado, refrescar lista
+                      if (result == true) {
+                        setState(() {
+                          _pedidosPendientes = api.fetchPedidosPendientes();
+                        });
+                      }
+                    },
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                    child: const Text("Procesar"),
+                    child: const Text("Realizar Pago"), // ⬅️ Cambiado de "Procesar"
                   ),
                   onTap: () {
-                    // ⬅️ Nuevo: al tocar el pedido abrimos detalle
+                    // Abrir detalle del pedido
                     Navigator.push(
                       context,
                       MaterialPageRoute(

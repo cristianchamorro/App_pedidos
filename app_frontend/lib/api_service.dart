@@ -214,6 +214,26 @@ class ApiService {
     }
   }
 
+  // ===============================
+// Confirmar pago de un pedido y cambiar estado a 'preparando'
+// ===============================
+  Future<bool> confirmarPago(int orderId, double efectivo) async {
+    final url = Uri.parse('$baseUrl/pedidos/$orderId/pagar');
+    final response = await http.put(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"efectivo": efectivo}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['success'] == true;
+    } else {
+      throw Exception('Error al confirmar pago: ${response.statusCode}');
+    }
+  }
+
+
 // ===============================
 // Marcar pedido como procesado
 // ===============================
