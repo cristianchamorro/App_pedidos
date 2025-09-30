@@ -206,7 +206,7 @@ class _LocationScreenState extends State<LocationScreen> {
     return Scaffold(
       backgroundColor: Colors.deepPurple[50],
       appBar: AppBar(
-        title: const Text("Captura de ubicación"),
+        title: const Text(""),
         backgroundColor: Colors.deepPurple,
       ),
       body: Center(

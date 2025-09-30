@@ -150,7 +150,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-            "Selecci�n de productos a ingresar al pedido por categor�a"),
+            ""),
         backgroundColor: Colors.deepPurple,
         actions: [
           if (widget.role == "admin")

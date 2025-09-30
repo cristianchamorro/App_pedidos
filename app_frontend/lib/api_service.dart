@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
-import 'models/product.dart';
 import 'models/categoria.dart';
+import 'models/product.dart';
 import 'models/vendor.dart';
 
 class ApiService {
@@ -14,7 +15,7 @@ class ApiService {
     if (kIsWeb) {
       baseUrl = "http://localhost:3000";
     } else if (Platform.isAndroid) {
-      baseUrl = "http://10.0.2.2:3000";
+      baseUrl = "http://192.168.101.2:3000";
     } else if (Platform.isIOS) {
       baseUrl = "http://localhost:3000";
     } else {
@@ -140,6 +141,40 @@ Future<List<Vendor>> fetchVendors() async {
     }
   } catch (e) {
     throw Exception('No se pudo conectar al backend: $e');
+  }
+}
+
+// ===============================
+// Obtener pedidos pendientes
+// ===============================
+Future<List<Map<String, dynamic>>> fetchPedidosPendientes() async {
+  final url = Uri.parse('$baseUrl/pedidos/pendientes');
+  final response = await http.get(url, headers: {"Content-Type": "application/json"});
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    if (data['success'] == true) {
+      return List<Map<String, dynamic>>.from(data['pedidos']);
+    } else {
+      throw Exception('Error al obtener pedidos pendientes');
+    }
+  } else {
+    throw Exception('Error del servidor: ${response.statusCode}');
+  }
+}
+
+// ===============================
+// Marcar pedido como procesado
+// ===============================
+Future<bool> procesarPedido(int orderId) async {
+  final url = Uri.parse('$baseUrl/pedidos/$orderId/procesar');
+  final response = await http.put(url, headers: {"Content-Type": "application/json"});
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return data['success'] == true;
+  } else {
+    throw Exception('Error al procesar pedido: ${response.statusCode}');
   }
 }
 

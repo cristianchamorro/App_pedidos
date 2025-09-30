@@ -177,7 +177,7 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
             TextField(
               controller: _nombreController,
               decoration: const InputDecoration(
-                labelText: "Nombre del receptor",
+                labelText: "Nombre del cliente",
                 border: OutlineInputBorder(),
               ),
             ),
@@ -186,7 +186,7 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
               controller: _telefonoController,
               keyboardType: TextInputType.phone,
               decoration: const InputDecoration(
-                labelText: "Teléfono del receptor",
+                labelText: "Teléfono del cliente",
                 border: OutlineInputBorder(),
               ),
             ),
@@ -195,7 +195,7 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
               controller: _direccionController,
               maxLines: 2,
               decoration: const InputDecoration(
-                labelText: "Dirección de entrega",
+                labelText: "Dirección de entrega, solo para Domicilios",
                 border: OutlineInputBorder(),
               ),
             ),
