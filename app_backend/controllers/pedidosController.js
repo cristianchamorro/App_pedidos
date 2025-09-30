@@ -11,8 +11,6 @@ const ESTADOS = {
 };
 
 // -------------------- Funciones internas --------------------
-
-// Cambia el estado de un pedido y guarda en status_history
 const cambiarEstadoPedido = async (id, nuevoEstado, changed_by = null) => {
   const client = await pool.connect();
   try {
@@ -173,101 +171,237 @@ const obtenerPedidosPorEstado = async (req, res) => {
   }
 };
 
-// Marcar preparando
-const marcarPreparando = async (req, res) => {
+// Obtener todos los pedidos
+const obtenerPedidos = async (req, res) => {
+  const client = await pool.connect();
   try {
-    const { id } = req.params;
-    const changed_by = req.body.changed_by || null;
-    const result = await cambiarEstadoPedido(id, ESTADOS.PREPARANDO, changed_by);
-    if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
-    res.json({ success: true, pedido: result.pedido });
+    const result = await client.query(
+      `SELECT 
+         o.id AS order_id,
+         o.total,
+         o.status,
+         o.created_at,
+         u.name AS cliente_nombre,
+         u.phone AS cliente_telefono,
+         u.address AS direccion_entrega,
+         json_agg(
+           json_build_object(
+             'product_id', oi.product_id,
+             'cantidad', oi.quantity,
+             'price', oi.price
+           )
+         ) AS productos
+       FROM orders o
+       JOIN users u ON u.id=o.user_id
+       JOIN order_items oi ON oi.order_id=o.id
+       GROUP BY o.id, o.total, o.status, o.created_at, u.name, u.phone, u.address
+       ORDER BY o.created_at ASC`
+    );
+
+    res.json({ success: true, pedidos: result.rows });
   } catch (err) {
-    res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
+    res.status(500).json({ error: 'Error al obtener pedidos', details: err.message });
+  } finally {
+    client.release();
   }
 };
 
-// Marcar listo
-const marcarListo = async (req, res) => {
+// -------------------- Cambios de estado --------------------
+const marcarPreparando = (req, res) =>
+  cambiarEstadoPedido(req.params.id, ESTADOS.PREPARANDO, req.body.changed_by)
+    .then(result => {
+      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      res.json({ success: true, pedido: result.pedido });
+    })
+    .catch(err => res.status(500).json({ error: 'Error al actualizar estado', details: err.message }));
+
+const marcarListo = (req, res) =>
+  cambiarEstadoPedido(req.params.id, ESTADOS.LISTO, req.body.changed_by)
+    .then(result => {
+      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      res.json({ success: true, pedido: result.pedido });
+    })
+    .catch(err => res.status(500).json({ error: 'Error al actualizar estado', details: err.message }));
+
+const marcarEntregado = (req, res) =>
+  cambiarEstadoPedido(req.params.id, ESTADOS.ENTREGADO, req.body.changed_by)
+    .then(result => {
+      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      res.json({ success: true, pedido: result.pedido });
+    })
+    .catch(err => res.status(500).json({ error: 'Error al actualizar estado', details: err.message }));
+
+const cancelarPedido = (req, res) =>
+  cambiarEstadoPedido(req.params.id, ESTADOS.CANCELADO, req.body.changed_by)
+    .then(result => {
+      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      res.json({ success: true, pedido: result.pedido });
+    })
+    .catch(err => res.status(500).json({ error: 'Error al actualizar estado', details: err.message }));
+
+const confirmarPago = (req, res) =>
+  cambiarEstadoPedido(req.params.id, ESTADOS.PAGADO, req.body.changed_by)
+    .then(result => {
+      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      res.json({ success: true, pedido: result.pedido });
+    })
+    .catch(err => res.status(500).json({ error: 'Error al confirmar pago', details: err.message }));
+
+const marcarListoCocina = (req, res) =>
+  cambiarEstadoPedido(req.params.id, ESTADOS.LISTO, req.body.changed_by)
+    .then(result => {
+      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      res.json({ success: true, pedido: result.pedido });
+    })
+    .catch(err => res.status(500).json({ error: 'Error al marcar pedido listo', details: err.message }));
+
+const marcarEntregadoCliente = (req, res) =>
+  cambiarEstadoPedido(req.params.id, ESTADOS.ENTREGADO, req.body.changed_by)
+    .then(result => {
+      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      res.json({ success: true, pedido: result.pedido });
+    })
+    .catch(err => res.status(500).json({ error: 'Error al entregar pedido', details: err.message }));
+
+// -------------------- Obtener detalle de pedido --------------------
+const obtenerPedidoPorId = async (req, res) => {
+  const { id } = req.params;
+  const client = await pool.connect();
   try {
-    const { id } = req.params;
-    const changed_by = req.body.changed_by || null;
-    const result = await cambiarEstadoPedido(id, ESTADOS.LISTO, changed_by);
-    if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
-    res.json({ success: true, pedido: result.pedido });
+    const resultPedido = await client.query(
+      `SELECT 
+         o.id AS order_id, 
+         u.name AS cliente_nombre, 
+         u.phone AS cliente_telefono,
+         u.address AS direccion_entrega, 
+         o.total, 
+         o.status
+       FROM orders o
+       JOIN users u ON u.id = o.user_id
+       WHERE o.id = $1`,
+      [id]
+    );
+
+    if (resultPedido.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Pedido no encontrado" });
+    }
+
+    const resultProductos = await client.query(
+      `SELECT 
+         oi.product_id, 
+         p.name, 
+         oi.quantity AS cantidad, 
+         oi.price
+       FROM order_items oi
+       JOIN products p ON oi.product_id = p.id
+       WHERE oi.order_id = $1`,
+      [id]
+    );
+
+    res.json({
+      success: true,
+      pedido: {
+        ...resultPedido.rows[0],
+        productos: resultProductos.rows
+      }
+    });
   } catch (err) {
-    res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
+    console.error("❌ Error en obtenerPedidoPorId:", err);
+    res.status(500).json({ success: false, error: "Error en el servidor" });
+  } finally {
+    client.release();
   }
 };
 
-// Marcar entregado
-const marcarEntregado = async (req, res) => {
+const obtenerDetallePedido = async (req, res) => {
+  const { id } = req.params;
+  const client = await pool.connect();
   try {
-    const { id } = req.params;
-    const changed_by = req.body.changed_by || null;
-    const result = await cambiarEstadoPedido(id, ESTADOS.ENTREGADO, changed_by);
-    if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
-    res.json({ success: true, pedido: result.pedido });
+    const resultPedido = await client.query(
+      `SELECT 
+         o.id AS order_id,
+         u.name AS cliente_nombre,
+         u.phone AS cliente_telefono,
+         u.address AS direccion_entrega,
+         o.total,
+         o.status
+       FROM orders o
+       JOIN users u ON u.id=o.user_id
+       WHERE o.id = $1`,
+      [id]
+    );
+
+    if (resultPedido.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Pedido no encontrado" });
+    }
+
+    const resultProductos = await client.query(
+      `SELECT 
+         oi.product_id, 
+         p.name, 
+         oi.quantity AS cantidad, 
+         oi.price
+       FROM order_items oi
+       JOIN products p ON oi.product_id = p.id
+       WHERE oi.order_id = $1`,
+      [id]
+    );
+
+    res.json({
+      success: true,
+      pedido: {
+        ...resultPedido.rows[0],
+        productos: resultProductos.rows
+      }
+    });
   } catch (err) {
-    res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
+    console.error("❌ Error en obtenerDetallePedido:", err);
+    res.status(500).json({ success: false, error: "Error en el servidor" });
+  } finally {
+    client.release();
   }
 };
 
-// Cancelar pedido
-const cancelarPedido = async (req, res) => {
+// -------------------- Actualizar pedido --------------------
+const actualizarPedido = async (req, res) => {
+  const { id } = req.params;
+  const { nota, productos } = req.body;
+
+  const client = await pool.connect();
   try {
-    const { id } = req.params;
-    const changed_by = req.body.changed_by || null;
-    const result = await cambiarEstadoPedido(id, ESTADOS.CANCELADO, changed_by);
-    if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
-    res.json({ success: true, pedido: result.pedido });
+    await client.query('BEGIN');
+
+    if (nota !== undefined) {
+      await client.query(`UPDATE orders SET nota = $1 WHERE id = $2`, [nota, id]);
+    }
+
+    if (Array.isArray(productos)) {
+      for (const prod of productos) {
+        await client.query(
+          `UPDATE order_items
+           SET quantity = $1, price = $2
+           WHERE order_id = $3 AND product_id = $4`,
+          [prod.cantidad, prod.price, id, prod.id]
+        );
+      }
+    }
+
+    await client.query('COMMIT');
+    res.json({ success: true, message: "Pedido actualizado correctamente" });
   } catch (err) {
-    res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
+    await client.query('ROLLBACK');
+    console.error("❌ Error en actualizarPedido:", err);
+    res.status(500).json({ success: false, error: err.message });
+  } finally {
+    client.release();
   }
 };
 
-// Confirmar pago
-const confirmarPago = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const changed_by = req.body.changed_by || null;
-    const result = await cambiarEstadoPedido(id, ESTADOS.PAGADO, changed_by);
-    if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
-    res.json({ success: true, pedido: result.pedido });
-  } catch (err) {
-    res.status(500).json({ error: 'Error al confirmar pago', details: err.message });
-  }
-};
-
-// Marcar listo en cocina
-const marcarListoCocina = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const changed_by = req.body.changed_by || null;
-    const result = await cambiarEstadoPedido(id, ESTADOS.LISTO, changed_by);
-    if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
-    res.json({ success: true, pedido: result.pedido });
-  } catch (err) {
-    res.status(500).json({ error: 'Error al marcar pedido listo', details: err.message });
-  }
-};
-
-// Marcar entregado por cliente
-const marcarEntregadoCliente = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const changed_by = req.body.changed_by || null;
-    const result = await cambiarEstadoPedido(id, ESTADOS.ENTREGADO, changed_by);
-    if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
-    res.json({ success: true, pedido: result.pedido });
-  } catch (err) {
-    res.status(500).json({ error: 'Error al entregar pedido', details: err.message });
-  }
-};
-
-// -------------------- Exportar --------------------
+// -------------------- Export --------------------
 module.exports = {
   crearPedido,
   obtenerPedidosPorEstado,
+  obtenerPedidos,
   marcarPreparando,
   marcarListo,
   marcarEntregado,
@@ -275,5 +409,8 @@ module.exports = {
   confirmarPago,
   marcarListoCocina,
   marcarEntregadoCliente,
-  cambiarEstadoPedido
+  cambiarEstadoPedido,
+  obtenerPedidoPorId,
+  obtenerDetallePedido,
+  actualizarPedido
 };

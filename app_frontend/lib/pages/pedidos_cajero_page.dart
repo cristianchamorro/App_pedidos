@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../api_service.dart';
+import 'detalle_pedido_page.dart'; // ⬅️ Importamos la nueva pantalla
 
 class PedidosCajeroPage extends StatefulWidget {
   const PedidosCajeroPage({Key? key}) : super(key: key);
@@ -64,12 +65,24 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                 child: ListTile(
                   title: Text("${pedido['cliente_nombre']} - \$${pedido['total']}"),
                   subtitle: Text(
-                      "Tel: ${pedido['cliente_telefono']}\nDirección: ${pedido['direccion_entrega']}"),
+                    "Tel: ${pedido['cliente_telefono']}\nDirección: ${pedido['direccion_entrega']}",
+                  ),
                   trailing: ElevatedButton(
                     onPressed: () => _procesarPedido(pedido['order_id']),
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
                     child: const Text("Procesar"),
                   ),
+                  onTap: () {
+                    // ⬅️ Nuevo: al tocar el pedido abrimos detalle
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetallePedidoPage(
+                          pedidoId: pedido['order_id'],
+                        ),
+                      ),
+                    );
+                  },
                 ),
               );
             },

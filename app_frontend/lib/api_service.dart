@@ -192,6 +192,27 @@ class ApiService {
     }
   }
 
+// ===============================
+// Obtener detalle de un pedido
+// ===============================
+  Future<Map<String, dynamic>> fetchDetallePedido(int orderId) async {
+    final url = Uri.parse('$baseUrl/pedidos/$orderId');
+    final response = await http.get(
+      url,
+      headers: {"Content-Type": "application/json"},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['success'] == true) {
+        return Map<String, dynamic>.from(data['pedido']);
+      } else {
+        throw Exception('Error al obtener detalle del pedido');
+      }
+    } else {
+      throw Exception('Error del servidor: ${response.statusCode}');
+    }
+  }
 
 // ===============================
 // Marcar pedido como procesado
