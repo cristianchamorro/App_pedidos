@@ -5,7 +5,6 @@ exports.loginAdmin = async (req, res) => {
   console.log(`[${new Date().toISOString()}] POST /loginAdmin recibido`, { username });
 
   try {
-    // JOIN con Roles usando solo role_id
     const result = await pool.query(
       `SELECT ua.id, ua.username, ua.name, ua.password,
               r.id AS role_id, r.name AS role_name
@@ -19,18 +18,21 @@ exports.loginAdmin = async (req, res) => {
 
     if (result.rows.length > 0) {
       const user = result.rows[0];
+      const roleName = user.role_name.toLowerCase(); // 👈 normalizamos aquí
 
       console.log(`[${new Date().toISOString()}] Login exitoso para usuario:`, username);
 
       res.json({
         success: true,
+        role: roleName,   // 👈 siempre en minúsculas
+        userId: user.id,
         user: {
           id: user.id,
           username: user.username,
           name: user.name,
           role: {
             id: user.role_id,
-            name: user.role_name
+            name: roleName // 👈 también en minúsculas
           }
         }
       });

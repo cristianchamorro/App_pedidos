@@ -26,19 +26,42 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
     });
 
     try {
-      final success = await _apiService.loginAdmin(
+      final result = await _apiService.loginAdmin(
         _usernameController.text.trim(),
         _passwordController.text.trim(),
       );
 
-      if (success) {
-        // ✅ Si login correcto → navega al home de admin
+      if (result["success"] == true) {
+        final role = result["role"] ?? "user";
+
         if (mounted) {
-          Navigator.pushReplacementNamed(
-            context,
-            '/location',
-            arguments: {'role': 'admin'},
-          );
+          switch (role) {
+            case "admin":
+              Navigator.pushReplacementNamed(
+                context,
+                '/location',
+                arguments: {"role": "admin"},
+              );
+              break;
+            case "cajero":
+              Navigator.pushReplacementNamed(
+                context,
+                '/cajero',
+                arguments: {"role": "cajero"},
+              );
+              break;
+            case "cocinero":
+              Navigator.pushReplacementNamed(
+                context,
+                '/cocinero',
+                arguments: {"role": "cocinero"},
+              );
+              break;
+            default:
+              setState(() {
+                _errorMessage = "Rol desconocido: $role";
+              });
+          }
         }
       } else {
         setState(() {
@@ -71,8 +94,11 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
               key: _formKey,
               child: Column(
                 children: [
-                  const Icon(Icons.admin_panel_settings,
-                      size: 100, color: Colors.deepPurple),
+                  const Icon(
+                    Icons.admin_panel_settings,
+                    size: 100,
+                    color: Colors.deepPurple,
+                  ),
                   const SizedBox(height: 20),
                   TextFormField(
                     controller: _usernameController,
@@ -81,7 +107,7 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) =>
-                        value == null || value.isEmpty ? "Ingrese usuario" : null,
+                    value == null || value.isEmpty ? "Ingrese usuario" : null,
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
@@ -91,9 +117,8 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
                       border: OutlineInputBorder(),
                     ),
                     obscureText: true,
-                    validator: (value) => value == null || value.isEmpty
-                        ? "Ingrese contraseña"
-                        : null,
+                    validator: (value) =>
+                    value == null || value.isEmpty ? "Ingrese contraseña" : null,
                   ),
                   const SizedBox(height: 20),
                   if (_errorMessage != null)
@@ -105,13 +130,13 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
                   _isLoading
                       ? const CircularProgressIndicator()
                       : ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurple,
-                            minimumSize: const Size(double.infinity, 50),
-                          ),
-                          onPressed: _login,
-                          child: const Text("Ingresar"),
-                        ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple,
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
+                    onPressed: _login,
+                    child: const Text("Ingresar"),
+                  ),
                 ],
               ),
             ),

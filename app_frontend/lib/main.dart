@@ -3,6 +3,10 @@ import 'package:app_pedidos/screens/location_screen.dart';
 import 'package:app_pedidos/pages/productos_por_categoria_page.dart';
 import 'package:app_pedidos/models/product.dart';
 import 'package:app_pedidos/pages/login_admin_page.dart';
+import 'pages/pedidos_cocinero_page.dart';
+// 🔹 Importamos
+import 'package:app_pedidos/pages/pedidos_cajero_page.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -23,14 +27,14 @@ class MyApp extends StatelessWidget {
       routes: {
         '/location': (context) {
           final args =
-              ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           final role = args['role'] as String;
 
           return LocationScreen(role: role); // ✅ pasamos el rol
         },
         '/productos': (context) {
           final args =
-              ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
           final productos = args['productos'] as List<Product>;
           final role = args['role'] as String;
@@ -46,6 +50,10 @@ class MyApp extends StatelessWidget {
             },
           );
         },
+
+        // 🔹 Rutas nuevas para roles
+        '/cajero': (context) => const PedidosCajeroPage(),
+        '/cocinero': (context) => const PedidosCocineroPage(),
       },
     );
   }
