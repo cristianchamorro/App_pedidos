@@ -39,7 +39,6 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
 
   @override
   void dispose() {
-    // ❌ Quitamos Navigator.pop() de aquí
     _nombreController.dispose();
     _telefonoController.dispose();
     _direccionController.dispose();
@@ -75,13 +74,13 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
         },
         "productos": widget.carrito
             .map((p) => {
-                  "id": p.id,
-                  "nombre": p.name,
-                  "cantidad": p.cantidad ?? 1,
-                  "price": p.price,
-                  "vendedor": p.vendorName ?? 'N/A',
-                  "driver": p.driverName ?? 'N/A',
-                })
+          "id": p.id,
+          "nombre": p.name,
+          "cantidad": p.cantidad ?? 1,
+          "price": p.price,
+          "vendedor": p.vendorName ?? 'N/A',
+          "driver": p.driverName ?? 'N/A',
+        })
             .toList(),
       };
 
@@ -102,7 +101,7 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
         setState(() {
           _pedidoConfirmado = true;
 
-          // 🔵 Limpiar cantidades, carrito y formularios
+          // Limpiar cantidades, carrito y formularios
           for (var p in widget.carrito) {
             p.resetCantidad();
           }
@@ -136,12 +135,12 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
     mensaje += "Teléfono: ${_telefonoController.text}\n";
     mensaje += "Dirección: ${_direccionController.text}\n";
     mensaje +=
-        "Ubicación: lat ${widget.ubicacion['lat']}, lng ${widget.ubicacion['lng']}\n\n";
+    "Ubicación: lat ${widget.ubicacion['lat']}, lng ${widget.ubicacion['lng']}\n\n";
     mensaje += "*Productos:*\n";
 
     for (var p in widget.carrito) {
       mensaje +=
-          "- ${p.name} (Cantidad: ${p.cantidad ?? 1})\n  Vendedor: ${p.vendorName ?? 'N/A'}\n  Driver: ${p.driverName ?? 'N/A'}\n  Precio unit: \$${p.price.toStringAsFixed(2)}\n";
+      "- ${p.name} (Cantidad: ${p.cantidad ?? 1})\n  Vendedor: ${p.vendorName ?? 'N/A'}\n  Driver: ${p.driverName ?? 'N/A'}\n  Precio unit: \$${p.price.toStringAsFixed(2)}\n";
     }
 
     mensaje += "\n*Total: \$${totalPedido.toStringAsFixed(2)}*";
@@ -152,8 +151,6 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
 
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
-
-      // ✅ Ahora sí volvemos a la pantalla anterior
       Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -206,49 +203,49 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
             ),
             const SizedBox(height: 8),
             ListView.builder(
-			shrinkWrap: true,
-			physics: const NeverScrollableScrollPhysics(),
-			itemCount: widget.carrito.length,
-			itemBuilder: (context, index) {
-				final producto = widget.carrito[index];
-				return ListTile(
-			leading: producto.imageUrl != null
-			? Image.network(producto.imageUrl!, width: 40, height: 40, fit: BoxFit.cover)
-			: const Icon(Icons.shopping_bag, color: Colors.deepPurple),
-				title: Text(producto.name),
-				subtitle: Text(
-					'Cantidad: ${producto.cantidad} | Vendedor: ${producto.vendorName ?? 'N/A'} | Driver: ${producto.driverName ?? 'N/A'}',
-				),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            "\$${(producto.price * producto.cantidad).toStringAsFixed(2)}",
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
-            onPressed: () {
-              setState(() {
-                widget.carrito.removeAt(index);
-              });
-            },
-          ),
-        ],
-      ),
-    );
-  },
-),
-
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: widget.carrito.length,
+              itemBuilder: (context, index) {
+                final producto = widget.carrito[index];
+                return ListTile(
+                  leading: producto.imageUrl != null
+                      ? Image.network(producto.imageUrl!,
+                      width: 40, height: 40, fit: BoxFit.cover)
+                      : const Icon(Icons.shopping_bag, color: Colors.deepPurple),
+                  title: Text(producto.name),
+                  subtitle: Text(
+                    'Cantidad: ${producto.cantidad} | Vendedor: ${producto.vendorName ?? 'N/A'} | Driver: ${producto.driverName ?? 'N/A'}',
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "\$${(producto.price * producto.cantidad).toStringAsFixed(2)}",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          setState(() {
+                            widget.carrito.removeAt(index);
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: 12),
             Text(
               "Total: \$${totalPedido.toStringAsFixed(2)}",
               style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green),
+                  fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
             ),
             const SizedBox(height: 20),
+
+            // Botón Confirmar Pedido
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -257,28 +254,36 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
                   backgroundColor: Colors.deepPurple,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text(
-                        "Confirmar Pedido",
-                        style: TextStyle(fontSize: 16),
-                      ),
+                  "Confirmar Pedido",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
               ),
             ),
+
             const SizedBox(height: 12),
+
+            // Botón Enviar a WhatsApp
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _pedidoConfirmado ? enviarWhatsApp : null,
-                icon: const FaIcon(FontAwesomeIcons.whatsapp),
-                label: const Text("Enviar pedido a WhatsApp"),
+                icon: const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.white),
+                label: const Text(
+                  "Enviar pedido a WhatsApp",
+                  style: TextStyle(color: Colors.white),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),

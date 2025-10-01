@@ -43,13 +43,13 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
 
   Future<Position> obtenerUbicacion() async {
     bool servicioActivo = await Geolocator.isLocationServiceEnabled();
-    if (!servicioActivo) throw 'El GPS est� desactivado';
+    if (!servicioActivo) throw 'El GPS está desactivado';
 
     LocationPermission permiso = await Geolocator.checkPermission();
     if (permiso == LocationPermission.denied) {
       permiso = await Geolocator.requestPermission();
       if (permiso == LocationPermission.denied) {
-        throw 'Permiso de ubicaci�n denegado';
+        throw 'Permiso de ubicación denegado';
       }
     }
 
@@ -58,7 +58,6 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
   }
 
   void abrirConfirmarPedido() async {
-    // 1️⃣ Validar que haya productos en el carrito
     if (carrito.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("No hay productos en el carrito")),
@@ -66,7 +65,6 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
       return;
     }
 
-    // 2️⃣ Obtener la ubicación del usuario
     Position posicion;
     try {
       posicion = await obtenerUbicacion();
@@ -76,7 +74,6 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
       return;
     }
 
-    // 3️⃣ Navegar a la página de Confirmar Pedido
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -88,17 +85,12 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
       ),
     );
 
-    // 4️⃣ Si el pedido se confirma correctamente
     if (result != null && result['success'] == true) {
       setState(() {
-        // Limpiar el carrito
         carrito.clear();
-
-        // 🔹 Resetear cantidades seleccionadas a 1
         cantidadesSeleccionadas.clear();
       });
 
-      // 5️⃣ Mostrar notificación de confirmación
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Pedido confirmado correctamente")),
       );
@@ -123,7 +115,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
               const Icon(Icons.image_not_supported, size: 80),
             const SizedBox(height: 12),
             Text(
-              producto.description ?? "Sin descripci�n",
+              producto.description ?? "Sin descripción",
               textAlign: TextAlign.center,
             ),
           ],
@@ -142,15 +134,14 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
   Widget build(BuildContext context) {
     final Map<String, List<Product>> productosPorCategoria = {};
     for (var producto in widget.productos) {
-      final catName = producto.categoryName ?? 'Sin categor�a';
+      final catName = producto.categoryName ?? 'Sin categoría';
       productosPorCategoria.putIfAbsent(catName, () => []);
       productosPorCategoria[catName]!.add(producto);
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-            ""),
+        title: const Text(""),
         backgroundColor: Colors.deepPurple,
         actions: [
           if (widget.role == "admin")
@@ -173,7 +164,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Direcci�n editable
+            // Dirección editable
             Card(
               color: Colors.deepPurple.withOpacity(0.1),
               shape: RoundedRectangleBorder(
@@ -207,7 +198,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
               ),
             ),
 
-            // Productos por categor�a
+            // Productos por categoría
             ...productosPorCategoria.entries.map((entry) {
               final categoryName = entry.key;
               final items = entry.value;
@@ -222,7 +213,8 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                   backgroundColor: Colors.deepPurple.withOpacity(0.05),
                   collapsedBackgroundColor:
                   Colors.deepPurple.withOpacity(0.03),
-                  leading: const Icon(Icons.category, color: Colors.deepPurple),
+                  leading:
+                  const Icon(Icons.category, color: Colors.deepPurple),
                   trailing: const Icon(Icons.keyboard_arrow_down,
                       color: Colors.deepPurple),
                   title: Text(
@@ -315,22 +307,21 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                         ),
                                       ),
                                       const SizedBox(height: 6),
-
-                                      // Selector de cantidad
                                       Row(
                                         mainAxisAlignment:
                                         MainAxisAlignment.center,
                                         children: [
                                           IconButton(
-                                            icon:
-                                            const Icon(Icons.remove, size: 20),
+                                            icon: const Icon(Icons.remove,
+                                                size: 20),
                                             onPressed: () {
                                               setState(() {
                                                 cantidadesSeleccionadas[
                                                 producto.id] =
                                                     (cantidadesSeleccionadas[
                                                     producto.id] ??
-                                                        1) - 1;
+                                                        1) -
+                                                        1;
                                                 if (cantidadesSeleccionadas[
                                                 producto.id]! <
                                                     1) {
@@ -346,7 +337,8 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                             const TextStyle(fontSize: 16),
                                           ),
                                           IconButton(
-                                            icon: const Icon(Icons.add, size: 20),
+                                            icon:
+                                            const Icon(Icons.add, size: 20),
                                             onPressed: () {
                                               setState(() {
                                                 cantidadesSeleccionadas[
@@ -360,7 +352,6 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                           ),
                                         ],
                                       ),
-
                                       const SizedBox(height: 6),
                                       SizedBox(
                                         width: double.infinity,
@@ -370,14 +361,14 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                             producto.id] ??
                                                 1;
 
-                                            // Verificar si el producto ya est� en el carrito
-                                            final indexExistente = carrito.indexWhere(
-                                                    (p) => p.id == producto.id);
+                                            final indexExistente = carrito
+                                                .indexWhere((p) =>
+                                            p.id == producto.id);
 
                                             if (indexExistente >= 0) {
-                                              // Si ya existe, actualizar la cantidad
                                               setState(() {
-                                                carrito[indexExistente].cantidad =cantidad;
+                                                carrito[indexExistente]
+                                                    .cantidad = cantidad;
                                               });
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
@@ -387,13 +378,14 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                                 ),
                                               );
                                             } else {
-                                              // Si no existe, agregar nuevo producto
                                               setState(() {
                                                 producto.cantidad = cantidad;
                                                 carrito.add(producto);
                                               });
-                                              if (widget.onAgregarAlPedido != null) {
-                                                widget.onAgregarAlPedido!(producto);
+                                              if (widget.onAgregarAlPedido !=
+                                                  null) {
+                                                widget.onAgregarAlPedido!(
+                                                    producto);
                                               }
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
@@ -404,8 +396,13 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                               );
                                             }
                                           },
-                                          icon: const Icon(Icons.add_shopping_cart),
-                                          label: const Text("Agregar"),
+                                          icon: const Icon(Icons.add_shopping_cart,
+                                              color: Colors.white),
+                                          label: const Text(
+                                            "Agregar Producto",
+                                            style:
+                                            TextStyle(color: Colors.white),
+                                          ),
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.deepPurple,
                                             shape: RoundedRectangleBorder(
@@ -433,8 +430,11 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: abrirConfirmarPedido,
-        icon: const Icon(Icons.check),
-        label: const Text('Confirmar Pedido'),
+        icon: const Icon(Icons.check, color: Colors.white),
+        label: const Text(
+          'Confirmar Pedido',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.deepPurple,
       ),
     );
