@@ -233,6 +233,66 @@ class ApiService {
     }
   }
 
+  // ===============================
+// Obtener pedidos en preparación
+// ===============================
+  Future<List<Map<String, dynamic>>> fetchPedidosEnPreparacion() async {
+    final url = Uri.parse('$baseUrl/pedidos?estado=pagado');
+    final response = await http.get(
+        url, headers: {"Content-Type": "application/json"});
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['success'] == true) {
+        return List<Map<String, dynamic>>.from(data['pedidos']);
+      } else {
+        throw Exception('Error al obtener pedidos en preparación');
+      }
+    } else {
+      throw Exception('Error del servidor: ${response.statusCode}');
+    }
+  }
+
+  // ===============================
+// Obtener pedidos por estado
+// ===============================
+  Future<List<Map<String, dynamic>>> obtenerPedidosPorEstado(String estado) async {
+    final url = Uri.parse('$baseUrl/pedidos?estado=$estado');
+    final response = await http.get(
+      url,
+      headers: {"Content-Type": "application/json"},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['success'] == true) {
+        return List<Map<String, dynamic>>.from(data['pedidos']);
+      } else {
+        throw Exception('Error al obtener pedidos con estado $estado');
+      }
+    } else {
+      throw Exception('Error del servidor: ${response.statusCode}');
+    }
+  }
+
+// ===============================
+// Marcar pedido como listo en cocina
+// ===============================
+  Future<bool> marcarListoCocina(int orderId, {String changedBy = "cocinero"}) async {
+    final url = Uri.parse('$baseUrl/pedidos/$orderId/listo-cocina');
+    final response = await http.put(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"changed_by": changedBy}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['success'] == true;
+    } else {
+      throw Exception('Error al marcar pedido listo en cocina: ${response.statusCode}');
+    }
+  }
 
 // ===============================
 // Marcar pedido como procesado
