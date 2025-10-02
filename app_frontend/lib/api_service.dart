@@ -218,7 +218,7 @@ class ApiService {
 // Confirmar pago de un pedido y cambiar estado a 'preparando'
 // ===============================
   Future<bool> confirmarPago(int orderId, double efectivo) async {
-    final url = Uri.parse('$baseUrl/pedidos/$orderId/pagar');
+    final url = Uri.parse('$baseUrl/pedidos/$orderId/pago');
     final response = await http.put(
       url,
       headers: {"Content-Type": "application/json"},
