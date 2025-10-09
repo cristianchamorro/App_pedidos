@@ -139,72 +139,80 @@ const obtenerPedidosPorEstado = async (req, res) => {
   const client = await pool.connect();
   try {
     const result = await client.query(
-      `SELECT 
-         o.id AS order_id,
-         o.total,
-         o.status,
-         o.created_at,
-         u.name AS cliente_nombre,
-         u.phone AS cliente_telefono,
-         u.address AS direccion_entrega,
-         json_agg(
-           json_build_object(
-             'product_id', oi.product_id,
-             'cantidad', oi.quantity,
-             'price', oi.price
-           )
-         ) AS productos
-       FROM orders o
-       JOIN users u ON u.id=o.user_id
-       JOIN order_items oi ON oi.order_id=o.id
-       WHERE LOWER(TRIM(o.status))=LOWER($1)
-       GROUP BY o.id, o.total, o.status, o.created_at, u.name, u.phone, u.address
-       ORDER BY o.created_at ASC`,
-      [estado]
-    );
+  `SELECT 
+     o.id AS order_id,
+     o.total,
+     o.status,
+     o.created_at,
+     u.name AS cliente_nombre,
+     u.phone AS cliente_telefono,
+     u.address AS direccion_entrega,
+     json_agg(
+       json_build_object(
+         'product_id', oi.product_id,
+         'nombre', p.name,        -- 👈 Nombre real del producto
+         'cantidad', oi.quantity,
+         'price', oi.price
+       )
+     ) AS productos
+   FROM orders o
+   JOIN users u ON u.id=o.user_id
+   JOIN order_items oi ON oi.order_id=o.id
+   JOIN products p ON p.id = oi.product_id   -- 👈 JOIN extra
+   WHERE LOWER(TRIM(o.status))=LOWER($1)
+   GROUP BY o.id, o.total, o.status, o.created_at, u.name, u.phone, u.address
+   ORDER BY o.created_at ASC`,
+  [estado]
+);
 
     res.json({ success: true, pedidos: result.rows });
   } catch (err) {
+    console.error("❌ Error en obtenerPedidosPorEstado:", err);
     res.status(500).json({ error: 'Error al obtener pedidos', details: err.message });
   } finally {
     client.release();
   }
 };
+
 
 // Obtener todos los pedidos
 const obtenerPedidos = async (req, res) => {
   const client = await pool.connect();
   try {
     const result = await client.query(
-      `SELECT 
-         o.id AS order_id,
-         o.total,
-         o.status,
-         o.created_at,
-         u.name AS cliente_nombre,
-         u.phone AS cliente_telefono,
-         u.address AS direccion_entrega,
-         json_agg(
-           json_build_object(
-             'product_id', oi.product_id,
-             'cantidad', oi.quantity,
-             'price', oi.price
-           )
-         ) AS productos
-       FROM orders o
-       JOIN users u ON u.id=o.user_id
-       JOIN order_items oi ON oi.order_id=o.id
-       GROUP BY o.id, o.total, o.status, o.created_at, u.name, u.phone, u.address
-       ORDER BY o.created_at ASC`
-    );
+  `SELECT 
+     o.id AS order_id,
+     o.total,
+     o.status,
+     o.created_at,
+     u.name AS cliente_nombre,
+     u.phone AS cliente_telefono,
+     u.address AS direccion_entrega,
+     json_agg(
+       json_build_object(
+         'product_id', oi.product_id,
+         'nombre', p.name,        -- 👈 Nombre real del producto
+         'cantidad', oi.quantity,
+         'price', oi.price
+       )
+     ) AS productos
+   FROM orders o
+   JOIN users u ON u.id=o.user_id
+   JOIN order_items oi ON oi.order_id=o.id
+   JOIN products p ON p.id = oi.product_id   -- 👈 JOIN extra
+   GROUP BY o.id, o.total, o.status, o.created_at, u.name, u.phone, u.address
+   ORDER BY o.created_at ASC`
+);
 
     res.json({ success: true, pedidos: result.rows });
   } catch (err) {
+    console.error("❌ Error en obtenerPedidos:", err);
     res.status(500).json({ error: 'Error al obtener pedidos', details: err.message });
   } finally {
     client.release();
   }
 };
+
 
 // -------------------- Cambios de estado --------------------
 const marcarPreparando = (req, res) =>

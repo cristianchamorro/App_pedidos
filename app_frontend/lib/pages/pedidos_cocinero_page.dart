@@ -24,30 +24,36 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
     try {
       final data = await api.obtenerPedidosPorEstado("pagado");
       setState(() {
-        pedidos = List<Map<String, dynamic>>.from(data);
+        pedidos = data;
         isLoading = false;
       });
     } catch (e) {
       setState(() => isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error cargando pedidos: $e")),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error cargando pedidos: $e")),
+        );
+      }
     }
   }
 
-  Future<void> _marcarComoListo(int id) async {
+  Future<void> _marcarComoListo(int orderId) async {
     try {
-      bool success = await api.marcarListoCocina(id);
+      bool success = await api.marcarListoCocina(orderId);
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Pedido marcado como listo")),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Pedido marcado como listo")),
+          );
+        }
         _cargarPedidos(); // refrescar lista
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error al marcar pedido: $e")),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error al marcar pedido: $e")),
+        );
+      }
     }
   }
 
@@ -72,18 +78,56 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
         itemCount: pedidos.length,
         itemBuilder: (context, index) {
           final pedido = pedidos[index];
+
+          final productos = (pedido["productos"] as List?) ?? [];
+
           return Card(
-            margin:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            child: ListTile(
-              title: Text("Pedido #${pedido["id"]}"),
-              subtitle: Text("Mesa: ${pedido["mesa"] ?? '-'}"),
-              trailing: ElevatedButton(
-                onPressed: () => _marcarComoListo(pedido["id"]),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                ),
-                child: const Text("Marcar listo"),
+            margin: const EdgeInsets.symmetric(
+                horizontal: 12, vertical: 6),
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Encabezado del pedido
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Pedido #${pedido["order_id"]}",
+                        style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      ElevatedButton(
+                        onPressed: () =>
+                            _marcarComoListo(pedido["order_id"]),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                        ),
+                        child: const Text("Marcar listo"),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text("Cliente: ${pedido["cliente_nombre"] ?? '-'}"),
+                  Text("Teléfono: ${pedido["cliente_telefono"] ?? '-'}"),
+                  Text("Dirección: ${pedido["direccion_entrega"] ?? '-'}"),
+                  Text("Total: \$${pedido["total"]}"),
+                  const SizedBox(height: 8),
+
+                  // Lista de productos
+                  if (productos.isNotEmpty) ...[
+                    const Text("Productos:",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    ...productos.map((prod) {
+                      return Text(
+                          "- ${prod["cantidad"]} x ${prod["nombre"]} (\$${prod["price"]})");
+                    }).toList(),
+                  ]
+                ],
               ),
             ),
           );

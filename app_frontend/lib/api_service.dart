@@ -15,7 +15,7 @@ class ApiService {
     if (kIsWeb) {
       baseUrl = "http://localhost:3000";
     } else if (Platform.isAndroid) {
-      baseUrl = "http://192.168.101.2:3000";
+      baseUrl = "http://172.16.1.200:3000";
     } else if (Platform.isIOS) {
       baseUrl = "http://localhost:3000";
     } else {
@@ -238,8 +238,7 @@ class ApiService {
 // ===============================
   Future<List<Map<String, dynamic>>> fetchPedidosEnPreparacion() async {
     final url = Uri.parse('$baseUrl/pedidos?estado=pagado');
-    final response = await http.get(
-        url, headers: {"Content-Type": "application/json"});
+    final response = await http.get(url, headers: {"Content-Type": "application/json"});
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -253,15 +252,12 @@ class ApiService {
     }
   }
 
-  // ===============================
+// ===============================
 // Obtener pedidos por estado
 // ===============================
   Future<List<Map<String, dynamic>>> obtenerPedidosPorEstado(String estado) async {
     final url = Uri.parse('$baseUrl/pedidos?estado=$estado');
-    final response = await http.get(
-      url,
-      headers: {"Content-Type": "application/json"},
-    );
+    final response = await http.get(url, headers: {"Content-Type": "application/json"});
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -279,7 +275,7 @@ class ApiService {
 // Marcar pedido como listo en cocina
 // ===============================
   Future<bool> marcarListoCocina(int orderId, {String changedBy = "cocinero"}) async {
-    final url = Uri.parse('$baseUrl/pedidos/$orderId/listo-cocina');
+    final url = Uri.parse('$baseUrl/pedidos/$orderId/listo'); // 👈 Ojo aquí
     final response = await http.put(
       url,
       headers: {"Content-Type": "application/json"},
