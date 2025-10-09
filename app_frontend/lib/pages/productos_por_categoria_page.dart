@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:app_pedidos/models/product.dart';
 import 'package:app_pedidos/pages/agregar_producto_page.dart';
 import 'package:app_pedidos/pages/confirmar_pedido_page.dart';
+import 'package:app_pedidos/pages/pedidos_cajero_page.dart';   // 👈 Import cajero
+import 'package:app_pedidos/pages/pedidos_cocinero_page.dart'; // 👈 Import cocinero
 import 'package:geolocator/geolocator.dart';
 
 class ProductosPorCategoriaPage extends StatefulWidget {
@@ -141,10 +143,10 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(""),
+        title: const Text("Productos"),
         backgroundColor: Colors.deepPurple,
         actions: [
-          if (widget.role == "admin")
+          if (widget.role == "admin") ...[
             IconButton(
               icon: const Icon(Icons.add),
               tooltip: "Agregar Producto",
@@ -157,6 +159,29 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                 );
               },
             ),
+            IconButton(
+              icon: const Icon(Icons.point_of_sale),
+              tooltip: "Ir a Cajero",
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const PedidosCajeroPage()), // 👈 Navega Cajero
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.restaurant_menu),
+              tooltip: "Ir a Cocinero",
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const PedidosCocineroPage()), // 👈 Navega Cocinero
+                );
+              },
+            ),
+          ],
         ],
       ),
       body: SingleChildScrollView(
@@ -213,8 +238,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                   backgroundColor: Colors.deepPurple.withOpacity(0.05),
                   collapsedBackgroundColor:
                   Colors.deepPurple.withOpacity(0.03),
-                  leading:
-                  const Icon(Icons.category, color: Colors.deepPurple),
+                  leading: const Icon(Icons.category, color: Colors.deepPurple),
                   trailing: const Icon(Icons.keyboard_arrow_down,
                       color: Colors.deepPurple),
                   title: Text(
@@ -337,8 +361,8 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                             const TextStyle(fontSize: 16),
                                           ),
                                           IconButton(
-                                            icon:
-                                            const Icon(Icons.add, size: 20),
+                                            icon: const Icon(Icons.add,
+                                                size: 20),
                                             onPressed: () {
                                               setState(() {
                                                 cantidadesSeleccionadas[
@@ -357,9 +381,10 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                         width: double.infinity,
                                         child: ElevatedButton.icon(
                                           onPressed: () {
-                                            final cantidad = cantidadesSeleccionadas[
-                                            producto.id] ??
-                                                1;
+                                            final cantidad =
+                                                cantidadesSeleccionadas[
+                                                producto.id] ??
+                                                    1;
 
                                             final indexExistente = carrito
                                                 .indexWhere((p) =>
@@ -368,7 +393,8 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                             if (indexExistente >= 0) {
                                               setState(() {
                                                 carrito[indexExistente]
-                                                    .cantidad = cantidad;
+                                                    .cantidad =
+                                                    cantidad;
                                               });
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
@@ -396,8 +422,8 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                               );
                                             }
                                           },
-                                          icon: const Icon(Icons.add_shopping_cart,
-                                              color: Colors.white),
+                                          icon: const Icon(Icons
+                                              .add_shopping_cart, color: Colors.white),
                                           label: const Text(
                                             "Agregar Producto",
                                             style:

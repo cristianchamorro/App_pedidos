@@ -1,3 +1,4 @@
+import 'dart:async'; // 👈 Importante
 import 'package:flutter/material.dart';
 import '../api_service.dart';
 
@@ -12,27 +13,37 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
   final ApiService api = ApiService();
   List<Map<String, dynamic>> pedidos = [];
   bool isLoading = true;
+  Timer? _timer; // 👈 Timer para refrescar automáticamente
 
   @override
   void initState() {
     super.initState();
     _cargarPedidos();
+
+    // Refrescar pedidos cada 5 segundos automáticamente
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      _cargarPedidos();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // 👈 Cancelar el timer al salir de la pantalla
+    super.dispose();
   }
 
   Future<void> _cargarPedidos() async {
-    setState(() => isLoading = true);
     try {
       final data = await api.obtenerPedidosPorEstado("pagado");
-      setState(() {
-        pedidos = data;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() => isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error cargando pedidos: $e")),
-        );
+        setState(() {
+          pedidos = data;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => isLoading = false);
       }
     }
   }
@@ -40,13 +51,11 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
   Future<void> _marcarComoListo(int orderId) async {
     try {
       bool success = await api.marcarListoCocina(orderId);
-      if (success) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Pedido marcado como listo")),
-          );
-        }
-        _cargarPedidos(); // refrescar lista
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Pedido marcado como listo")),
+        );
+        _cargarPedidos(); // refrescar lista inmediatamente
       }
     } catch (e) {
       if (mounted) {
@@ -62,13 +71,7 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Pedidos - Cocinero"),
-        backgroundColor: Colors.orange,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _cargarPedidos,
-          )
-        ],
+        backgroundColor: Colors.deepPurple,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -78,7 +81,6 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
         itemCount: pedidos.length,
         itemBuilder: (context, index) {
           final pedido = pedidos[index];
-
           final productos = (pedido["productos"] as List?) ?? [];
 
           return Card(
@@ -96,14 +98,14 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
                       Text(
                         "Pedido #${pedido["order_id"]}",
                         style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold),
                       ),
                       ElevatedButton(
                         onPressed: () =>
                             _marcarComoListo(pedido["order_id"]),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
+                          backgroundColor: Colors.deepPurple,
                         ),
                         child: const Text("Marcar listo"),
                       ),
@@ -113,18 +115,46 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
                   Text("Cliente: ${pedido["cliente_nombre"] ?? '-'}"),
                   Text("Teléfono: ${pedido["cliente_telefono"] ?? '-'}"),
                   Text("Dirección: ${pedido["direccion_entrega"] ?? '-'}"),
-                  Text("Total: \$${pedido["total"]}"),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
 
-                  // Lista de productos
+                  // Lista de productos en grande
                   if (productos.isNotEmpty) ...[
-                    const Text("Productos:",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 4),
+                    const Text(
+                      "Productos a preparar:",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                     ...productos.map((prod) {
-                      return Text(
-                          "- ${prod["cantidad"]} x ${prod["nombre"]} (\$${prod["price"]})");
+                      return Padding(
+                        padding:
+                        const EdgeInsets.symmetric(vertical: 6),
+                        child: Row(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${prod["cantidad"]}x ",
+                              style: const TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.deepPurple,
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                "${prod["nombre"]}",
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
                     }).toList(),
                   ]
                 ],
