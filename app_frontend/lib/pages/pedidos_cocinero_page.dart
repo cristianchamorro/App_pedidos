@@ -70,8 +70,38 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Pedidos - Cocinero"),
-        backgroundColor: Colors.deepPurple,
+        title: const Text(
+          "Pedidos para preparar en cocina",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            letterSpacing: 1.2,
+          ),
+        ),
+        centerTitle: true,
+        elevation: 8,
+        backgroundColor: Colors.transparent, // permite mostrar el gradient
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.deepPurple, Colors.purpleAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(20),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 8,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -105,9 +135,9 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
                         onPressed: () =>
                             _marcarComoListo(pedido["order_id"]),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple,
+                          backgroundColor: Colors.green,
                         ),
-                        child: const Text("Marcar listo"),
+                        child: const Text("Marcar como Preparado"),
                       ),
                     ],
                   ),

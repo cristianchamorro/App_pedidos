@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../api_service.dart';
+import 'pago_page.dart';
 
 class DetallePedidoPage extends StatefulWidget {
   final int pedidoId;
@@ -24,8 +25,32 @@ class _DetallePedidoPageState extends State<DetallePedidoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Detalle del Pedido"),
-        backgroundColor: Colors.deepPurple,
+        title: const Text(
+          "Detalles del Pedido",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            letterSpacing: 1.2,
+          ),
+        ),
+        centerTitle: true,
+        elevation: 8,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.deepPurple, Colors.purpleAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+            boxShadow: [
+              BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4))
+            ],
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: _detallePedido,
@@ -46,7 +71,6 @@ class _DetallePedidoPageState extends State<DetallePedidoPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 🧑 Cliente
                 Text(
                   "Cliente: ${pedido['cliente_nombre'] ?? 'Sin nombre'}",
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -55,22 +79,16 @@ class _DetallePedidoPageState extends State<DetallePedidoPage> {
                 Text("Teléfono: ${pedido['cliente_telefono'] ?? 'Sin teléfono'}"),
                 Text("Dirección: ${pedido['direccion_entrega'] ?? 'Sin dirección'}"),
                 const SizedBox(height: 8),
-
-                // 💲 Total
                 Text(
                   "Total: \$${pedido['total'] ?? 0}",
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-
-                // 📦 Estado
                 Text(
                   "Estado: ${pedido['status'] ?? 'Desconocido'}",
                   style: const TextStyle(fontSize: 16),
                 ),
                 const Divider(height: 20, thickness: 2),
-
-                // 🛒 Lista de productos
                 const Text(
                   "Productos:",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -86,6 +104,43 @@ class _DetallePedidoPageState extends State<DetallePedidoPage> {
                     ),
                   );
                 }).toList(),
+                const SizedBox(height: 20),
+                Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      final pagoExitoso = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PagoPage(
+                            pedidoId: widget.pedidoId,
+                            total: double.tryParse(pedido['total'].toString()) ?? 0.0,
+                          ),
+                        ),
+                      );
+
+                      if (pagoExitoso == true) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Pago realizado con éxito")),
+                        );
+
+                        // 🔹 Cerramos esta pantalla y devolvemos true a la lista
+                        Navigator.pop(context, true);
+                      }
+                    },
+                    icon: const Icon(Icons.payment),
+                    label: const Text(
+                      "Realizar Pago",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           );

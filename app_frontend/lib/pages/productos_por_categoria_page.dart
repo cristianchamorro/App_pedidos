@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:app_pedidos/models/product.dart';
 import 'package:app_pedidos/pages/agregar_producto_page.dart';
 import 'package:app_pedidos/pages/confirmar_pedido_page.dart';
-import 'package:app_pedidos/pages/pedidos_cajero_page.dart';   // 👈 Import cajero
-import 'package:app_pedidos/pages/pedidos_cocinero_page.dart'; // 👈 Import cocinero
+import 'package:app_pedidos/pages/pedidos_cajero_page.dart';   //
+import 'package:app_pedidos/pages/pedidos_cocinero_page.dart'; //
 import 'package:geolocator/geolocator.dart';
 
 class ProductosPorCategoriaPage extends StatefulWidget {
@@ -143,8 +143,30 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Productos"),
-        backgroundColor: Colors.deepPurple,
+        title: const Text(
+          "Lista de Productos",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+          ),
+        ),
+        centerTitle: true, // centrar el título
+        elevation: 6, // sombra
+        backgroundColor: Colors.transparent, // transparente porque usamos flexibleSpace
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.deepPurple, Colors.purpleAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(20),
+            ),
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white), // iconos blancos
         actions: [
           if (widget.role == "admin") ...[
             IconButton(
@@ -166,7 +188,8 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const PedidosCajeroPage()), // 👈 Navega Cajero
+                    builder: (context) => const PedidosCajeroPage(),
+                  ),
                 );
               },
             ),
@@ -177,7 +200,8 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const PedidosCocineroPage()), // 👈 Navega Cocinero
+                    builder: (context) => const PedidosCocineroPage(),
+                  ),
                 );
               },
             ),

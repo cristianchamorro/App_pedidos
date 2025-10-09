@@ -206,8 +206,38 @@ class _LocationScreenState extends State<LocationScreen> {
     return Scaffold(
       backgroundColor: Colors.deepPurple[50],
       appBar: AppBar(
-        title: const Text(""),
-        backgroundColor: Colors.deepPurple,
+        title: const Text(
+          "Captura de ubicación de usuario",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            letterSpacing: 1.1,
+          ),
+        ),
+        centerTitle: true,
+        elevation: 8,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.deepPurple, Colors.purpleAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(20),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 8,
+                offset: Offset(0, 4),
+              )
+            ],
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Center(
         child: Padding(

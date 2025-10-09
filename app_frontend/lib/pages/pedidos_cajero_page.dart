@@ -24,8 +24,38 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Pedidos Pendientes - Cajero"),
-        backgroundColor: Colors.deepPurple,
+        title: const Text(
+          "Pedidos Pendientes por pagar",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            letterSpacing: 1.2,
+          ),
+        ),
+        centerTitle: true,
+        elevation: 8,
+        backgroundColor: Colors.transparent, // necesario para ver el gradient
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.deepPurple, Colors.purpleAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(20),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 8,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _pedidosPendientes,
@@ -71,11 +101,11 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                       }
                     },
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                    child: const Text("Realizar Pago"), // ⬅️ Cambiado de "Procesar"
+                    child: const Text("Realizar Pago"),
                   ),
-                  onTap: () {
-                    // Abrir detalle del pedido
-                    Navigator.push(
+                  onTap: () async {
+                    // Abrir detalle del pedido y esperar si se realiza pago
+                    final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => DetallePedidoPage(
@@ -83,6 +113,13 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                         ),
                       ),
                     );
+
+                    // 🔹 Si desde detalle se realizó el pago, refrescar la lista automáticamente
+                    if (result == true) {
+                      setState(() {
+                        _pedidosPendientes = api.fetchPedidosPendientes();
+                      });
+                    }
                   },
                 ),
               );
