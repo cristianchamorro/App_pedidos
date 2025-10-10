@@ -11,6 +11,16 @@ const ESTADOS = {
 };
 
 // -------------------- Funciones internas --------------------
+
+// Helper function to release a driver back to 'available' status
+const liberarDriverPorOrder = async (client, orderId) => {
+  await client.query(
+    `UPDATE drivers SET status='available', updated_at=NOW() 
+     WHERE id=(SELECT driver_id FROM orders WHERE id=$1)`,
+    [orderId]
+  );
+};
+
 const cambiarEstadoPedido = async (id, nuevoEstado, changed_by = null) => {
   const client = await pool.connect();
   try {
@@ -75,13 +85,21 @@ const crearPedido = async (req, res) => {
       await client.query(`UPDATE users SET address=$1 WHERE id=$2`, [direccion_entrega, user_id]);
     }
 
-    // Asignar driver más cercano
+    // Asignar driver más cercano de forma atómica
     const driverResult = await client.query(
-      `SELECT id
-       FROM drivers
-       WHERE status='available'
-       ORDER BY location <-> ST_SetSRID(ST_MakePoint($1, $2), 4326)
-       LIMIT 1`,
+      `WITH candidato AS (
+         SELECT id
+         FROM drivers
+         WHERE status='available'
+         ORDER BY location <-> ST_SetSRID(ST_MakePoint($1, $2), 4326)
+         LIMIT 1
+         FOR UPDATE SKIP LOCKED
+       )
+       UPDATE drivers d
+       SET status='busy', updated_at=NOW()
+       FROM candidato c
+       WHERE d.id=c.id
+       RETURNING d.id`,
       [ubicacion.lng, ubicacion.lat]
     );
 
@@ -231,21 +249,57 @@ const marcarListo = (req, res) =>
     })
     .catch(err => res.status(500).json({ error: 'Error al actualizar estado', details: err.message }));
 
-const marcarEntregado = (req, res) =>
-  cambiarEstadoPedido(req.params.id, ESTADOS.ENTREGADO, req.body.changed_by)
-    .then(result => {
-      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
-      res.json({ success: true, pedido: result.pedido });
-    })
-    .catch(err => res.status(500).json({ error: 'Error al actualizar estado', details: err.message }));
+const marcarEntregado = async (req, res) => {
+  try {
+    const result = await cambiarEstadoPedido(req.params.id, ESTADOS.ENTREGADO, req.body.changed_by);
+    if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+    
+    // Release driver back to available status
+    if (result.success) {
+      try {
+        const client = await pool.connect();
+        try {
+          await liberarDriverPorOrder(client, req.params.id);
+        } finally {
+          client.release();
+        }
+      } catch (releaseErr) {
+        console.error('Error al liberar driver:', releaseErr);
+        // Continue with successful response even if driver release fails
+      }
+    }
+    
+    res.json({ success: true, pedido: result.pedido });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
+  }
+};
 
-const cancelarPedido = (req, res) =>
-  cambiarEstadoPedido(req.params.id, ESTADOS.CANCELADO, req.body.changed_by)
-    .then(result => {
-      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
-      res.json({ success: true, pedido: result.pedido });
-    })
-    .catch(err => res.status(500).json({ error: 'Error al actualizar estado', details: err.message }));
+const cancelarPedido = async (req, res) => {
+  try {
+    const result = await cambiarEstadoPedido(req.params.id, ESTADOS.CANCELADO, req.body.changed_by);
+    if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+    
+    // Release driver back to available status
+    if (result.success) {
+      try {
+        const client = await pool.connect();
+        try {
+          await liberarDriverPorOrder(client, req.params.id);
+        } finally {
+          client.release();
+        }
+      } catch (releaseErr) {
+        console.error('Error al liberar driver:', releaseErr);
+        // Continue with successful response even if driver release fails
+      }
+    }
+    
+    res.json({ success: true, pedido: result.pedido });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
+  }
+};
 
 const confirmarPago = (req, res) =>
   cambiarEstadoPedido(req.params.id, ESTADOS.PAGADO, req.body.changed_by)
@@ -263,13 +317,31 @@ const marcarListoCocina = (req, res) =>
     })
     .catch(err => res.status(500).json({ error: 'Error al marcar pedido listo', details: err.message }));
 
-const marcarEntregadoCliente = (req, res) =>
-  cambiarEstadoPedido(req.params.id, ESTADOS.ENTREGADO, req.body.changed_by)
-    .then(result => {
-      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
-      res.json({ success: true, pedido: result.pedido });
-    })
-    .catch(err => res.status(500).json({ error: 'Error al entregar pedido', details: err.message }));
+const marcarEntregadoCliente = async (req, res) => {
+  try {
+    const result = await cambiarEstadoPedido(req.params.id, ESTADOS.ENTREGADO, req.body.changed_by);
+    if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+    
+    // Release driver back to available status
+    if (result.success) {
+      try {
+        const client = await pool.connect();
+        try {
+          await liberarDriverPorOrder(client, req.params.id);
+        } finally {
+          client.release();
+        }
+      } catch (releaseErr) {
+        console.error('Error al liberar driver:', releaseErr);
+        // Continue with successful response even if driver release fails
+      }
+    }
+    
+    res.json({ success: true, pedido: result.pedido });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al entregar pedido', details: err.message });
+  }
+};
 
 // -------------------- Obtener detalle de pedido --------------------
 const obtenerPedidoPorId = async (req, res) => {
