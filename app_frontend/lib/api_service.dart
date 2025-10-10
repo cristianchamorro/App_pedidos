@@ -306,6 +306,25 @@ class ApiService {
     }
   }
 
+// ===============================
+// Marcar pedido como entregado (domiciliario)
+// ===============================
+  Future<bool> marcarEntregadoCliente(int orderId, {String changedBy = "domiciliario"}) async {
+    final url = Uri.parse('$baseUrl/pedidos/$orderId/entregado-cliente');
+    final response = await http.put(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"changed_by": changedBy}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['success'] == true;
+    } else {
+      throw Exception('Error al marcar pedido entregado: ${response.statusCode}');
+    }
+  }
+
   // ===============================
   // 🔑 Login de administrador
   // ===============================

@@ -6,6 +6,7 @@ import 'package:app_pedidos/pages/login_admin_page.dart';
 import 'pages/pedidos_cocinero_page.dart';
 // 🔹 Importamos
 import 'package:app_pedidos/pages/pedidos_cajero_page.dart';
+import 'package:app_pedidos/pages/pedidos_domiciliario_page.dart';
 
 
 void main() {
@@ -54,6 +55,7 @@ class MyApp extends StatelessWidget {
         // 🔹 Rutas nuevas para roles
         '/cajero': (context) => const PedidosCajeroPage(),
         '/cocinero': (context) => const PedidosCocineroPage(),
+        '/domiciliario': (context) => const PedidosDomiciliarioPage(),
       },
     );
   }
