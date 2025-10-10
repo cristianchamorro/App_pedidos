@@ -44,6 +44,9 @@ flutter run -d chrome
 
 - **[SETUP.md](SETUP.md)** - Guía completa de instalación y configuración
 - **[API_DOCUMENTATION.md](API_DOCUMENTATION.md)** - Documentación detallada de todos los endpoints
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Guía de despliegue en producción
+- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Solución de problemas comunes
+- **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)** - Resumen completo del proyecto
 
 ## 🏗️ Estructura del Proyecto
 
