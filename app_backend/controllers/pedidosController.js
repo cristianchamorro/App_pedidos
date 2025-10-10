@@ -295,7 +295,6 @@ const marcarListo = (req, res) =>
       res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
     });
 
-<<<<<<< HEAD
 const marcarEntregado = async (req, res) => {
   try {
     const result = await cambiarEstadoPedido(req.params.id, ESTADOS.ENTREGADO, req.body.changed_by);
@@ -347,39 +346,6 @@ const cancelarPedido = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
   }
 };
-=======
-const marcarEntregado = (req, res) =>
-  cambiarEstadoPedido(req.params.id, ESTADOS.ENTREGADO, req.body.changed_by)
-    .then(result => {
-      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
-      res.json({ success: true, pedido: result.pedido });
-    })
-    .catch(err => {
-      console.error('❌ Error en marcarEntregado:', {
-        code: err.code,
-        message: err.message,
-        detail: err.detail,
-        stack: err.stack,
-      });
-      res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
-    });
-
-const cancelarPedido = (req, res) =>
-  cambiarEstadoPedido(req.params.id, ESTADOS.CANCELADO, req.body.changed_by)
-    .then(result => {
-      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
-      res.json({ success: true, pedido: result.pedido });
-    })
-    .catch(err => {
-      console.error('❌ Error en cancelarPedido:', {
-        code: err.code,
-        message: err.message,
-        detail: err.detail,
-        stack: err.stack,
-      });
-      res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
-    });
->>>>>>> e263b90 (estados de cocina - ok)
 
 const confirmarPago = (req, res) =>
   cambiarEstadoPedido(req.params.id, ESTADOS.PAGADO, req.body.changed_by)
@@ -413,12 +379,11 @@ const marcarListoCocina = (req, res) =>
       res.status(500).json({ error: 'Error al marcar pedido listo', details: err.message });
     });
 
-<<<<<<< HEAD
 const marcarEntregadoCliente = async (req, res) => {
   try {
     const result = await cambiarEstadoPedido(req.params.id, ESTADOS.ENTREGADO, req.body.changed_by);
     if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
-    
+
     // Release driver back to available status
     if (result.success) {
       try {
@@ -433,29 +398,12 @@ const marcarEntregadoCliente = async (req, res) => {
         // Continue with successful response even if driver release fails
       }
     }
-    
+
     res.json({ success: true, pedido: result.pedido });
   } catch (err) {
     res.status(500).json({ error: 'Error al entregar pedido', details: err.message });
   }
 };
-=======
-const marcarEntregadoCliente = (req, res) =>
-  cambiarEstadoPedido(req.params.id, ESTADOS.ENTREGADO, req.body.changed_by)
-    .then(result => {
-      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
-      res.json({ success: true, pedido: result.pedido });
-    })
-    .catch(err => {
-      console.error('❌ Error en marcarEntregadoCliente:', {
-        code: err.code,
-        message: err.message,
-        detail: err.detail,
-        stack: err.stack,
-      });
-      res.status(500).json({ error: 'Error al entregar pedido', details: err.message });
-    });
->>>>>>> e263b90 (estados de cocina - ok)
 
 // -------------------- Obtener detalle de pedido --------------------
 const obtenerPedidoPorId = async (req, res) => {
