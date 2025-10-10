@@ -10,6 +10,14 @@ const ESTADOS = {
   PAGADO: 'pagado'
 };
 
+// -------------------- Helpers --------------------
+// Helper para normalizar changed_by (acepta number/numérico en string; cualquier otro => null)
+const normalizeChangedBy = (val) => {
+  if (val === undefined || val === null) return null;
+  const n = Number(val);
+  return Number.isFinite(n) ? Math.trunc(n) : null;
+};
+
 // -------------------- Funciones internas --------------------
 
 // Helper function to release a driver back to 'available' status
@@ -36,16 +44,24 @@ const cambiarEstadoPedido = async (id, nuevoEstado, changed_by = null) => {
       return { success: false, notFound: true };
     }
 
+    const changedByVal = normalizeChangedBy(changed_by);
+
     await client.query(
       `INSERT INTO status_history (order_id, status, changed_by)
        VALUES ($1, $2, $3)`,
-      [id, nuevoEstado, changed_by]
+      [id, nuevoEstado, changedByVal]
     );
 
     await client.query('COMMIT');
     return { success: true, pedido: result.rows[0] };
   } catch (err) {
     await client.query('ROLLBACK');
+    console.error('❌ Error en cambiarEstadoPedido:', {
+      code: err.code,
+      message: err.message,
+      detail: err.detail,
+      stack: err.stack,
+    });
     throw err;
   } finally {
     client.release();
@@ -141,6 +157,12 @@ const crearPedido = async (req, res) => {
     res.status(201).json({ success: true, order_id, driver_id, total });
   } catch (err) {
     await client.query('ROLLBACK');
+    console.error('❌ Error en crearPedido:', {
+      code: err.code,
+      message: err.message,
+      detail: err.detail,
+      stack: err.stack,
+    });
     res.status(500).json({ error: 'Error al crear pedido', details: err.message });
   } finally {
     client.release();
@@ -168,7 +190,7 @@ const obtenerPedidosPorEstado = async (req, res) => {
      json_agg(
        json_build_object(
          'product_id', oi.product_id,
-         'nombre', p.name,        -- 👈 Nombre real del producto
+         'nombre', p.name,
          'cantidad', oi.quantity,
          'price', oi.price
        )
@@ -176,7 +198,7 @@ const obtenerPedidosPorEstado = async (req, res) => {
    FROM orders o
    JOIN users u ON u.id=o.user_id
    JOIN order_items oi ON oi.order_id=o.id
-   JOIN products p ON p.id = oi.product_id   -- 👈 JOIN extra
+   JOIN products p ON p.id = oi.product_id
    WHERE LOWER(TRIM(o.status))=LOWER($1)
    GROUP BY o.id, o.total, o.status, o.created_at, u.name, u.phone, u.address
    ORDER BY o.created_at ASC`,
@@ -185,13 +207,17 @@ const obtenerPedidosPorEstado = async (req, res) => {
 
     res.json({ success: true, pedidos: result.rows });
   } catch (err) {
-    console.error("❌ Error en obtenerPedidosPorEstado:", err);
+    console.error("❌ Error en obtenerPedidosPorEstado:", {
+      code: err.code,
+      message: err.message,
+      detail: err.detail,
+      stack: err.stack,
+    });
     res.status(500).json({ error: 'Error al obtener pedidos', details: err.message });
   } finally {
     client.release();
   }
 };
-
 
 // Obtener todos los pedidos
 const obtenerPedidos = async (req, res) => {
@@ -209,7 +235,7 @@ const obtenerPedidos = async (req, res) => {
      json_agg(
        json_build_object(
          'product_id', oi.product_id,
-         'nombre', p.name,        -- 👈 Nombre real del producto
+         'nombre', p.name,
          'cantidad', oi.quantity,
          'price', oi.price
        )
@@ -217,20 +243,24 @@ const obtenerPedidos = async (req, res) => {
    FROM orders o
    JOIN users u ON u.id=o.user_id
    JOIN order_items oi ON oi.order_id=o.id
-   JOIN products p ON p.id = oi.product_id   -- 👈 JOIN extra
+   JOIN products p ON p.id = oi.product_id
    GROUP BY o.id, o.total, o.status, o.created_at, u.name, u.phone, u.address
    ORDER BY o.created_at ASC`
 );
 
     res.json({ success: true, pedidos: result.rows });
   } catch (err) {
-    console.error("❌ Error en obtenerPedidos:", err);
+    console.error("❌ Error en obtenerPedidos:", {
+      code: err.code,
+      message: err.message,
+      detail: err.detail,
+      stack: err.stack,
+    });
     res.status(500).json({ error: 'Error al obtener pedidos', details: err.message });
   } finally {
     client.release();
   }
 };
-
 
 // -------------------- Cambios de estado --------------------
 const marcarPreparando = (req, res) =>
@@ -239,7 +269,15 @@ const marcarPreparando = (req, res) =>
       if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
       res.json({ success: true, pedido: result.pedido });
     })
-    .catch(err => res.status(500).json({ error: 'Error al actualizar estado', details: err.message }));
+    .catch(err => {
+      console.error('❌ Error en marcarPreparando:', {
+        code: err.code,
+        message: err.message,
+        detail: err.detail,
+        stack: err.stack,
+      });
+      res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
+    });
 
 const marcarListo = (req, res) =>
   cambiarEstadoPedido(req.params.id, ESTADOS.LISTO, req.body.changed_by)
@@ -247,8 +285,17 @@ const marcarListo = (req, res) =>
       if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
       res.json({ success: true, pedido: result.pedido });
     })
-    .catch(err => res.status(500).json({ error: 'Error al actualizar estado', details: err.message }));
+    .catch(err => {
+      console.error('❌ Error en marcarListo:', {
+        code: err.code,
+        message: err.message,
+        detail: err.detail,
+        stack: err.stack,
+      });
+      res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
+    });
 
+<<<<<<< HEAD
 const marcarEntregado = async (req, res) => {
   try {
     const result = await cambiarEstadoPedido(req.params.id, ESTADOS.ENTREGADO, req.body.changed_by);
@@ -300,6 +347,39 @@ const cancelarPedido = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
   }
 };
+=======
+const marcarEntregado = (req, res) =>
+  cambiarEstadoPedido(req.params.id, ESTADOS.ENTREGADO, req.body.changed_by)
+    .then(result => {
+      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      res.json({ success: true, pedido: result.pedido });
+    })
+    .catch(err => {
+      console.error('❌ Error en marcarEntregado:', {
+        code: err.code,
+        message: err.message,
+        detail: err.detail,
+        stack: err.stack,
+      });
+      res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
+    });
+
+const cancelarPedido = (req, res) =>
+  cambiarEstadoPedido(req.params.id, ESTADOS.CANCELADO, req.body.changed_by)
+    .then(result => {
+      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      res.json({ success: true, pedido: result.pedido });
+    })
+    .catch(err => {
+      console.error('❌ Error en cancelarPedido:', {
+        code: err.code,
+        message: err.message,
+        detail: err.detail,
+        stack: err.stack,
+      });
+      res.status(500).json({ error: 'Error al actualizar estado', details: err.message });
+    });
+>>>>>>> e263b90 (estados de cocina - ok)
 
 const confirmarPago = (req, res) =>
   cambiarEstadoPedido(req.params.id, ESTADOS.PAGADO, req.body.changed_by)
@@ -307,7 +387,15 @@ const confirmarPago = (req, res) =>
       if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
       res.json({ success: true, pedido: result.pedido });
     })
-    .catch(err => res.status(500).json({ error: 'Error al confirmar pago', details: err.message }));
+    .catch(err => {
+      console.error('❌ Error en confirmarPago:', {
+        code: err.code,
+        message: err.message,
+        detail: err.detail,
+        stack: err.stack,
+      });
+      res.status(500).json({ error: 'Error al confirmar pago', details: err.message });
+    });
 
 const marcarListoCocina = (req, res) =>
   cambiarEstadoPedido(req.params.id, ESTADOS.LISTO, req.body.changed_by)
@@ -315,8 +403,17 @@ const marcarListoCocina = (req, res) =>
       if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
       res.json({ success: true, pedido: result.pedido });
     })
-    .catch(err => res.status(500).json({ error: 'Error al marcar pedido listo', details: err.message }));
+    .catch(err => {
+      console.error('❌ Error en marcarListoCocina:', {
+        code: err.code,
+        message: err.message,
+        detail: err.detail,
+        stack: err.stack,
+      });
+      res.status(500).json({ error: 'Error al marcar pedido listo', details: err.message });
+    });
 
+<<<<<<< HEAD
 const marcarEntregadoCliente = async (req, res) => {
   try {
     const result = await cambiarEstadoPedido(req.params.id, ESTADOS.ENTREGADO, req.body.changed_by);
@@ -342,6 +439,23 @@ const marcarEntregadoCliente = async (req, res) => {
     res.status(500).json({ error: 'Error al entregar pedido', details: err.message });
   }
 };
+=======
+const marcarEntregadoCliente = (req, res) =>
+  cambiarEstadoPedido(req.params.id, ESTADOS.ENTREGADO, req.body.changed_by)
+    .then(result => {
+      if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      res.json({ success: true, pedido: result.pedido });
+    })
+    .catch(err => {
+      console.error('❌ Error en marcarEntregadoCliente:', {
+        code: err.code,
+        message: err.message,
+        detail: err.detail,
+        stack: err.stack,
+      });
+      res.status(500).json({ error: 'Error al entregar pedido', details: err.message });
+    });
+>>>>>>> e263b90 (estados de cocina - ok)
 
 // -------------------- Obtener detalle de pedido --------------------
 const obtenerPedidoPorId = async (req, res) => {
@@ -386,7 +500,12 @@ const obtenerPedidoPorId = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error("❌ Error en obtenerPedidoPorId:", err);
+    console.error("❌ Error en obtenerPedidoPorId:", {
+      code: err.code,
+      message: err.message,
+      detail: err.detail,
+      stack: err.stack,
+    });
     res.status(500).json({ success: false, error: "Error en el servidor" });
   } finally {
     client.release();
@@ -435,7 +554,12 @@ const obtenerDetallePedido = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error("❌ Error en obtenerDetallePedido:", err);
+    console.error("❌ Error en obtenerDetallePedido:", {
+      code: err.code,
+      message: err.message,
+      detail: err.detail,
+      stack: err.stack,
+    });
     res.status(500).json({ success: false, error: "Error en el servidor" });
   } finally {
     client.release();
@@ -470,7 +594,12 @@ const actualizarPedido = async (req, res) => {
     res.json({ success: true, message: "Pedido actualizado correctamente" });
   } catch (err) {
     await client.query('ROLLBACK');
-    console.error("❌ Error en actualizarPedido:", err);
+    console.error("❌ Error en actualizarPedido:", {
+      code: err.code,
+      message: err.message,
+      detail: err.detail,
+      stack: err.stack,
+    });
     res.status(500).json({ success: false, error: err.message });
   } finally {
     client.release();
@@ -482,6 +611,11 @@ module.exports = {
   crearPedido,
   obtenerPedidosPorEstado,
   obtenerPedidos,
+  // Asegúrate que estas funciones estén definidas arriba
+  obtenerPedidoPorId,
+  obtenerDetallePedido,
+
+  // Estados
   marcarPreparando,
   marcarListo,
   marcarEntregado,
@@ -489,8 +623,10 @@ module.exports = {
   confirmarPago,
   marcarListoCocina,
   marcarEntregadoCliente,
+
+  // Utilidades que usas en otros módulos (si aplica)
   cambiarEstadoPedido,
-  obtenerPedidoPorId,
-  obtenerDetallePedido,
-  actualizarPedido
+
+  // Actualización
+  actualizarPedido,
 };

@@ -6,7 +6,8 @@ import 'package:app_pedidos/pages/login_admin_page.dart';
 import 'pages/pedidos_cocinero_page.dart';
 // 🔹 Importamos
 import 'package:app_pedidos/pages/pedidos_cajero_page.dart';
-
+// 🔹 NUEVO: Domiciliario
+import 'package:app_pedidos/pages/domiciliario_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -54,6 +55,9 @@ class MyApp extends StatelessWidget {
         // 🔹 Rutas nuevas para roles
         '/cajero': (context) => const PedidosCajeroPage(),
         '/cocinero': (context) => const PedidosCocineroPage(),
+
+        // 🔹 NUEVO: ruta para domiciliario
+        '/domiciliario': (context) => const DomiciliarioPage(),
       },
     );
   }
@@ -99,6 +103,17 @@ class RoleSelectionScreen extends StatelessWidget {
                 backgroundColor: Colors.deepPurple,
               ),
               child: const Text("Ingresar como Administrador"),
+            ),
+            const SizedBox(height: 20),
+            // 🔹 NUEVO: acceso a domiciliario
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/domiciliario');
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal,
+              ),
+              child: const Text("Ingresar como Domiciliario"),
             ),
           ],
         ),

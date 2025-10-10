@@ -207,7 +207,7 @@ class _LocationScreenState extends State<LocationScreen> {
       backgroundColor: Colors.deepPurple[50],
       appBar: AppBar(
         title: const Text(
-          "Captura de ubicación de usuario",
+          "Capturar ubicación de usuario",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
