@@ -57,6 +57,13 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
                 arguments: {"role": "cocinero"},
               );
               break;
+            case "domiciliario":
+              Navigator.pushReplacementNamed(
+                context,
+                '/domiciliario',
+                arguments: {"role": "domiciliario"},
+              );
+              break;
             default:
               setState(() {
                 _errorMessage = "Rol desconocido: $role";
