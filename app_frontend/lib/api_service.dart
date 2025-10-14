@@ -15,7 +15,7 @@ class ApiService {
     if (kIsWeb) {
       baseUrl = "http://localhost:3000";
     } else if (Platform.isAndroid) {
-      baseUrl = "http://172.16.1.200:3000";
+      baseUrl = "http://192.168.101.6:3000";
     } else if (Platform.isIOS) {
       baseUrl = "http://localhost:3000";
     } else {
