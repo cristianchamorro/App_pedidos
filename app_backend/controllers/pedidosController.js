@@ -29,6 +29,48 @@ const liberarDriverPorOrder = async (client, orderId) => {
   );
 };
 
+// Helper function to restore inventory when an order is canceled
+const restaurarInventarioPorOrder = async (client, orderId) => {
+  try {
+    // Get all products from the canceled order
+    const orderItems = await client.query(
+      `SELECT oi.product_id, oi.quantity 
+       FROM order_items oi
+       WHERE oi.order_id = $1`,
+      [orderId]
+    );
+
+    // Restore inventory for each product
+    for (const item of orderItems.rows) {
+      const invCheck = await client.query(
+        'SELECT quantity FROM inventory WHERE product_id = $1',
+        [item.product_id]
+      );
+
+      if (invCheck.rows.length > 0) {
+        const currentQty = invCheck.rows[0].quantity;
+        const newQty = currentQty + item.quantity;
+
+        await client.query(
+          'UPDATE inventory SET quantity = $1, last_updated = NOW() WHERE product_id = $2',
+          [newQty, item.product_id]
+        );
+
+        // Log inventory movement
+        await client.query(
+          `INSERT INTO inventory_movements 
+           (product_id, movement_type, quantity, previous_quantity, new_quantity, reason, order_id)
+           VALUES ($1, 'devolucion', $2, $3, $4, $5, $6)`,
+          [item.product_id, item.quantity, currentQty, newQty, 'Devolución - Pedido cancelado #' + orderId, orderId]
+        );
+      }
+    }
+  } catch (err) {
+    console.error('⚠️ Error al restaurar inventario:', err.message);
+    // Don't throw - we don't want to fail the cancellation
+  }
+};
+
 const cambiarEstadoPedido = async (id, nuevoEstado, changed_by = null) => {
   const client = await pool.connect();
   try {
@@ -144,6 +186,43 @@ const crearPedido = async (req, res) => {
          VALUES ($1, $2, $3, $4)`,
         [order_id, p.id, p.cantidad, p.price]
       );
+    }
+
+    // Reducir stock de inventario (si existe la tabla)
+    try {
+      for (const p of productos) {
+        // Check if product has inventory record
+        const invCheck = await client.query(
+          'SELECT quantity FROM inventory WHERE product_id = $1',
+          [p.id]
+        );
+
+        if (invCheck.rows.length > 0) {
+          const currentQty = invCheck.rows[0].quantity;
+          
+          // Only deduct if there's enough stock (warning, don't block order)
+          if (currentQty >= p.cantidad) {
+            const newQty = currentQty - p.cantidad;
+            await client.query(
+              'UPDATE inventory SET quantity = $1, last_updated = NOW() WHERE product_id = $2',
+              [newQty, p.id]
+            );
+
+            // Log inventory movement
+            await client.query(
+              `INSERT INTO inventory_movements 
+               (product_id, movement_type, quantity, previous_quantity, new_quantity, reason, order_id)
+               VALUES ($1, 'salida', $2, $3, $4, $5, $6)`,
+              [p.id, -p.cantidad, currentQty, newQty, 'Venta - Pedido #' + order_id, order_id]
+            );
+          } else {
+            console.warn(`⚠️ Stock insuficiente para producto ${p.id}. Disponible: ${currentQty}, Solicitado: ${p.cantidad}`);
+          }
+        }
+      }
+    } catch (invErr) {
+      // Don't fail the order if inventory update fails
+      console.error('⚠️ Error al actualizar inventario (orden continúa):', invErr.message);
     }
 
     // Registrar en status_history
@@ -326,18 +405,19 @@ const cancelarPedido = async (req, res) => {
     const result = await cambiarEstadoPedido(req.params.id, ESTADOS.CANCELADO, req.body.changed_by);
     if (result.notFound) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
     
-    // Release driver back to available status
+    // Release driver and restore inventory
     if (result.success) {
       try {
         const client = await pool.connect();
         try {
           await liberarDriverPorOrder(client, req.params.id);
+          await restaurarInventarioPorOrder(client, req.params.id);
         } finally {
           client.release();
         }
       } catch (releaseErr) {
-        console.error('Error al liberar driver:', releaseErr);
-        // Continue with successful response even if driver release fails
+        console.error('Error al liberar driver o restaurar inventario:', releaseErr);
+        // Continue with successful response even if these operations fail
       }
     }
     

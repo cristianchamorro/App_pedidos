@@ -32,6 +32,7 @@ const adminRoutes = require('./routes/admin');
 const adminProductsRoutes = require('./routes/adminProducts');
 const adminDataRoutes = require('./routes/adminData');
 const driversRoutes = require('./routes/drivers');
+const inventoryRoutes = require('./routes/inventory');
 
 app.use('/productos', productosRoutes);
 app.use('/pedidos', pedidosRoutes);
@@ -39,6 +40,7 @@ app.use('/', adminRoutes);
 app.use('/admin', adminProductsRoutes);
 app.use('/admin', adminDataRoutes);
 app.use('/drivers', driversRoutes);
+app.use('/inventory', inventoryRoutes);
 
 // -----------------------------
 // Iniciar servidor
