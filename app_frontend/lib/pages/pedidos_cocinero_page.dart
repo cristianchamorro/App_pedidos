@@ -14,6 +14,7 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
   List<Map<String, dynamic>> pedidos = [];
   bool isLoading = true;
   Timer? _timer; // 👈 Timer para refrescar automáticamente
+  int? _userId;
 
   @override
   void initState() {
@@ -24,6 +25,16 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       _cargarPedidos();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Get userId from navigation arguments
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null && args.containsKey('userId')) {
+      _userId = args['userId'] as int?;
+    }
   }
 
   @override
@@ -50,7 +61,7 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
 
   Future<void> _marcarComoListo(int orderId) async {
     try {
-      bool success = await api.marcarListoCocina(orderId);
+      bool success = await api.marcarListoCocina(orderId, changedBy: _userId);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Pedido marcado como listo")),

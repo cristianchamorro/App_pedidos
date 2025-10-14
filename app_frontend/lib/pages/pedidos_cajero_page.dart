@@ -13,11 +13,22 @@ class PedidosCajeroPage extends StatefulWidget {
 class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
   final ApiService api = ApiService();
   late Future<List<Map<String, dynamic>>> _pedidosPendientes;
+  int? _userId;
 
   @override
   void initState() {
     super.initState();
     _pedidosPendientes = api.fetchPedidosPendientes();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Get userId from navigation arguments
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null && args.containsKey('userId')) {
+      _userId = args['userId'] as int?;
+    }
   }
 
   @override
@@ -89,6 +100,7 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                           builder: (context) => PagoPage(
                             pedidoId: pedido['order_id'],
                             total: double.tryParse(pedido['total'].toString()) ?? 0.0,
+                            userId: _userId,
                           ),
                         ),
                       );
