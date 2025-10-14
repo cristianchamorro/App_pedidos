@@ -33,6 +33,9 @@ const adminProductsRoutes = require('./routes/adminProducts');
 const adminDataRoutes = require('./routes/adminData');
 const driversRoutes = require('./routes/drivers');
 const inventoryRoutes = require('./routes/inventory');
+const reportsRoutes = require('./routes/reports');
+const expensesRoutes = require('./routes/expenses');
+const paymentMethodsRoutes = require('./routes/paymentMethods');
 
 app.use('/productos', productosRoutes);
 app.use('/pedidos', pedidosRoutes);
@@ -41,6 +44,9 @@ app.use('/admin', adminProductsRoutes);
 app.use('/admin', adminDataRoutes);
 app.use('/drivers', driversRoutes);
 app.use('/inventory', inventoryRoutes);
+app.use('/reports', reportsRoutes);
+app.use('/expenses', expensesRoutes);
+app.use('/payment-methods', paymentMethodsRoutes);
 
 // -----------------------------
 // Iniciar servidor
