@@ -33,6 +33,7 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
 
       if (result["success"] == true) {
         final role = result["role"] ?? "user";
+        final userId = result["userId"] ?? 0;
 
         if (mounted) {
           switch (role) {
@@ -40,21 +41,21 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
               Navigator.pushReplacementNamed(
                 context,
                 '/location',
-                arguments: {"role": "admin"},
+                arguments: {"role": "admin", "userId": userId},
               );
               break;
             case "cajero":
               Navigator.pushReplacementNamed(
                 context,
                 '/cajero',
-                arguments: {"role": "cajero"},
+                arguments: {"role": "cajero", "userId": userId},
               );
               break;
             case "cocinero":
               Navigator.pushReplacementNamed(
                 context,
                 '/cocinero',
-                arguments: {"role": "cocinero"},
+                arguments: {"role": "cocinero", "userId": userId},
               );
               break;
             default:

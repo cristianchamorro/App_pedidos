@@ -211,12 +211,16 @@ class ApiService {
   // ===============================
   // Confirmar pago de un pedido y cambiar estado a 'preparando'
   // ===============================
-  Future<bool> confirmarPago(int orderId, double efectivo) async {
+  Future<bool> confirmarPago(int orderId, double efectivo, {int? changedBy}) async {
     final url = Uri.parse('$baseUrl/pedidos/$orderId/pago');
+    final body = {
+      "efectivo": efectivo,
+      if (changedBy != null) "changed_by": changedBy,
+    };
     final response = await http.put(
       url,
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"efectivo": efectivo}),
+      body: jsonEncode(body),
     );
 
     if (response.statusCode == 200) {
@@ -268,12 +272,16 @@ class ApiService {
   // ===============================
   // Marcar pedido como listo en cocina
   // ===============================
-  Future<bool> marcarListoCocina(int orderId, {String changedBy = "cocinero"}) async {
+  Future<bool> marcarListoCocina(int orderId, {int? changedBy}) async {
     final url = Uri.parse('$baseUrl/pedidos/$orderId/listo'); // 👈 Ojo aquí
+    final body = <String, dynamic>{};
+    if (changedBy != null) {
+      body["changed_by"] = changedBy;
+    }
     final response = await http.put(
       url,
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"changed_by": changedBy}),
+      body: jsonEncode(body),
     );
 
     if (response.statusCode == 200) {

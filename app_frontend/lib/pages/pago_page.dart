@@ -4,8 +4,9 @@ import '../api_service.dart';
 class PagoPage extends StatefulWidget {
   final int pedidoId;
   final double total;
+  final int? userId;
 
-  const PagoPage({Key? key, required this.pedidoId, required this.total}) : super(key: key);
+  const PagoPage({Key? key, required this.pedidoId, required this.total, this.userId}) : super(key: key);
 
   @override
   _PagoPageState createState() => _PagoPageState();
@@ -35,7 +36,11 @@ class _PagoPageState extends State<PagoPage> {
 
     try {
       // 1️⃣ Confirmar pago en backend y actualizar estado a 'preparando'
-      bool success = await api.confirmarPago(widget.pedidoId, efectivo);
+      bool success = await api.confirmarPago(
+        widget.pedidoId, 
+        efectivo, 
+        changedBy: widget.userId,
+      );
       if (success) {
         // 2️⃣ Mostrar alerta de pago realizado
         ScaffoldMessenger.of(context).showSnackBar(
