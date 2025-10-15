@@ -84,7 +84,7 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
             .toList(),
       };
 
-      final url = Uri.parse('http://127.0.0.1:3000/pedidos');
+      final url = Uri.parse('http://192.168.101.6:3000/pedidos');
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
