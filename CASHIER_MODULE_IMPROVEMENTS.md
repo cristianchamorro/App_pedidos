@@ -99,12 +99,10 @@ Se crearon 4 endpoints nuevos:
 
 Se agregaron 4 métodos nuevos en `api_service.dart`:
 
-```dart
-- obtenerVentasDelDia()
-- obtenerReporteVentas(String fechaInicio, String fechaFin)
-- obtenerHistorialPagos({int limit = 50, int offset = 0})
-- obtenerEstadisticasCaja()
-```
+- `obtenerVentasDelDia()` - Obtiene ventas del día actual
+- `obtenerReporteVentas(String fechaInicio, String fechaFin)` - Genera reporte por rango de fechas
+- `obtenerHistorialPagos({int limit = 50, int offset = 0})` - Obtiene historial de pagos con paginación
+- `obtenerEstadisticasCaja()` - Obtiene estadísticas generales de caja
 
 ## Dependencias Nuevas
 
@@ -134,7 +132,7 @@ Se agregaron 4 métodos nuevos en `api_service.dart`:
 ## Características Técnicas
 
 ### Backend
-- Consultas SQL optimizadas con agregaciones
+- Consultas SQL optimizadas con agregaciones y consultas parametrizadas
 - Manejo de errores robusto
 - Paginación en historial de pagos
 - Soporte para múltiples estados de pedidos

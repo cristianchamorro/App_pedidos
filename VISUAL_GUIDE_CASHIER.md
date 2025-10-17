@@ -248,7 +248,7 @@ Ejemplo de reporte generado:
 ## 🎨 Elementos de Diseño
 
 ### Paleta de Colores:
-- **Principal**: Degradado Púrpura (DeepPurple → PurpleAccent)
+- **Principal**: Gradiente Púrpura (DeepPurple → PurpleAccent)
 - **Éxito**: Verde (#4CAF50)
 - **Advertencia**: Naranja (#FF9800)
 - **Error**: Rojo (#F44336)
@@ -309,6 +309,7 @@ Todas las pantallas son:
 7. **Reportes flexibles**: Múltiples opciones de período
 
 ### Tiempos de Respuesta:
+(bajo condiciones normales de red con < 1000 registros)
 - Carga de estadísticas: < 1s
 - Generación de reportes: < 2s
 - Confirmación de pago: < 1s

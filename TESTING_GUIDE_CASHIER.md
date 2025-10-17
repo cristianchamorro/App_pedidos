@@ -5,7 +5,7 @@
 ### Pre-requisitos
 1. Base de datos PostgreSQL ejecutándose
 2. Datos de prueba en las tablas `orders`, `users`, `order_items`, `products`, `status_history`
-3. Node.js instalado
+3. Node.js 16.x o superior instalado
 
 ### Iniciar el Backend
 ```bash
@@ -161,7 +161,7 @@ Respuesta esperada:
 ## 📱 Pruebas del Frontend
 
 ### Pre-requisitos
-1. Backend ejecutándose en http://localhost:3000 o http://192.168.101.6:3000
+1. Backend ejecutándose en http://YOUR_BACKEND_IP:3000
 2. Flutter SDK instalado
 3. Emulador Android/iOS o dispositivo físico
 
@@ -370,7 +370,7 @@ Verificar que las funcionalidades existentes siguen funcionando:
 - [ ] Scroll es fluido
 
 ### Seguridad
-- [ ] SQL injection protegido (prepared statements)
+- [x] SQL injection protegido (consultas parametrizadas)
 - [ ] Validación de entrada en frontend
 - [ ] Validación de entrada en backend
 - [ ] Manejo de errores no expone información sensible
