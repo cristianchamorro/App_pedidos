@@ -26,6 +26,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+		<!-- 🔑 Clave API de Google Maps -->
+        <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="AIzaSyD8Muujft2JVnEL_2tRDHkR_J56dz8HbSU"/>
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
