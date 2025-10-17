@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:app_pedidos/screens/location_screen.dart';
 import 'package:app_pedidos/pages/productos_por_categoria_page.dart';
 import 'package:app_pedidos/models/product.dart';
+import 'package:app_pedidos/pages/login_choice_page.dart';
 import 'package:app_pedidos/pages/login_admin_page.dart';
 import 'pages/pedidos_cocinero_page.dart';
-// 🔹 Importamos
 import 'package:app_pedidos/pages/pedidos_cajero_page.dart';
-// 🔹 NUEVO: Domiciliario
 import 'package:app_pedidos/pages/domiciliario_page.dart';
 
 void main() {
@@ -24,7 +23,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      home: const RoleSelectionScreen(), // ✅ pantalla inicial
+      home: const LoginChoicePage(), // ✅ pantalla inicial unificada
       routes: {
         '/location': (context) {
           final args =
@@ -52,72 +51,23 @@ class MyApp extends StatelessWidget {
           );
         },
 
-        // 🔹 Rutas nuevas para roles
-        '/cajero': (context) => const PedidosCajeroPage(),
-        '/cocinero': (context) => const PedidosCocineroPage(),
-
-        // 🔹 NUEVO: ruta para domiciliario
-        '/domiciliario': (context) => const DomiciliarioPage(),
+        // Rutas para roles administrativos
+        '/cajero': (context) {
+          final args =
+              ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return const PedidosCajeroPage();
+        },
+        '/cocinero': (context) {
+          final args =
+              ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return const PedidosCocineroPage();
+        },
+        '/domiciliario': (context) {
+          final args =
+              ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return const DomiciliarioPage();
+        },
       },
-    );
-  }
-}
-
-/// Pantalla inicial para seleccionar rol
-class RoleSelectionScreen extends StatelessWidget {
-  const RoleSelectionScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Seleccionar Rol"),
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(
-                  context,
-                  '/location',
-                  arguments: {'role': 'user'},
-                );
-              },
-              child: const Text("Ingresar como Usuario"),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // ✅ Ahora primero abre el login de administrador
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const LoginAdminPage(),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
-              ),
-              child: const Text("Ingresar como Administrador"),
-            ),
-            const SizedBox(height: 20),
-            // 🔹 NUEVO: acceso a domiciliario
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/domiciliario');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal,
-              ),
-              child: const Text("Ingresar como Domiciliario"),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
