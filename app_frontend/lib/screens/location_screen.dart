@@ -28,8 +28,9 @@ class _LocationScreenState extends State<LocationScreen> {
   final TextEditingController _searchAddressController =
       TextEditingController();
   
-  // Store recent addresses
+  // Store recent addresses (max 3, session-only storage)
   final List<String> _recentAddresses = [];
+  static const int _maxRecentAddresses = 3;
 
   bool get _isMobileOrDesktop =>
       !kIsWeb &&
@@ -53,6 +54,21 @@ class _LocationScreenState extends State<LocationScreen> {
     _manualAddressController.dispose();
     _searchAddressController.dispose();
     super.dispose();
+  }
+  
+  /// Helper method to format coordinates as a string
+  String _formatCoordinates(double lat, double lng) {
+    return "Lat: ${lat.toStringAsFixed(6)}, Lng: ${lng.toStringAsFixed(6)}";
+  }
+  
+  /// Helper method to add address to recent addresses list
+  void _addToRecentAddresses(String address) {
+    if (!_recentAddresses.contains(address)) {
+      _recentAddresses.insert(0, address);
+      if (_recentAddresses.length > _maxRecentAddresses) {
+        _recentAddresses.removeLast();
+      }
+    }
   }
 
   Future<void> _getCurrentLocation() async {
@@ -109,18 +125,13 @@ class _LocationScreenState extends State<LocationScreen> {
           _address =
               "${place.street ?? ''}, ${place.locality ?? ''}, ${place.administrativeArea ?? ''}";
         } else {
-          _address = "Lat: ${position.latitude.toStringAsFixed(6)}, Lng: ${position.longitude.toStringAsFixed(6)}";
+          _address = _formatCoordinates(position.latitude, position.longitude);
         }
         _locationConfirmed = true;
         _loading = false;
         
-        // Add to recent addresses if not already there
-        if (!_recentAddresses.contains(_address)) {
-          _recentAddresses.insert(0, _address);
-          if (_recentAddresses.length > 3) {
-            _recentAddresses.removeLast();
-          }
-        }
+        // Add to recent addresses
+        _addToRecentAddresses(_address);
       });
     } catch (e) {
       setState(() {
@@ -221,19 +232,13 @@ class _LocationScreenState extends State<LocationScreen> {
             _address =
                 "${place.street ?? ''}, ${place.locality ?? ''}, ${place.administrativeArea ?? ''}";
           } else {
-            _address =
-                "Lat: ${pickedLocation.latitude.toStringAsFixed(6)}, Lng: ${pickedLocation.longitude.toStringAsFixed(6)}";
+            _address = _formatCoordinates(pickedLocation.latitude, pickedLocation.longitude);
           }
           _locationConfirmed = true;
           _loading = false;
           
           // Add to recent addresses
-          if (!_recentAddresses.contains(_address)) {
-            _recentAddresses.insert(0, _address);
-            if (_recentAddresses.length > 3) {
-              _recentAddresses.removeLast();
-            }
-          }
+          _addToRecentAddresses(_address);
         });
       } catch (e) {
         setState(() {
@@ -260,19 +265,24 @@ class _LocationScreenState extends State<LocationScreen> {
       _locationAccuracy = null;
       
       // Add to recent addresses
-      if (!_recentAddresses.contains(_address)) {
-        _recentAddresses.insert(0, _address);
-        if (_recentAddresses.length > 3) {
-          _recentAddresses.removeLast();
-        }
-      }
+      _addToRecentAddresses(_address);
     });
   }
   
   Future<void> _searchAddress() async {
-    if (_searchAddressController.text.trim().isEmpty) {
+    String searchQuery = _searchAddressController.text.trim();
+    
+    // Validate minimum search length
+    if (searchQuery.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Por favor ingresa una dirección para buscar")),
+      );
+      return;
+    }
+    
+    if (searchQuery.length < 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("La dirección debe tener al menos 3 caracteres")),
       );
       return;
     }
@@ -283,9 +293,7 @@ class _LocationScreenState extends State<LocationScreen> {
     });
 
     try {
-      List<Location> locations = await locationFromAddress(
-        _searchAddressController.text.trim(),
-      );
+      List<Location> locations = await locationFromAddress(searchQuery);
 
       if (locations.isNotEmpty) {
         Location loc = locations.first;
@@ -303,18 +311,13 @@ class _LocationScreenState extends State<LocationScreen> {
             _address =
                 "${place.street ?? ''}, ${place.locality ?? ''}, ${place.administrativeArea ?? ''}";
           } else {
-            _address = _searchAddressController.text.trim();
+            _address = searchQuery;
           }
           _locationConfirmed = true;
           _loading = false;
           
           // Add to recent addresses
-          if (!_recentAddresses.contains(_address)) {
-            _recentAddresses.insert(0, _address);
-            if (_recentAddresses.length > 3) {
-              _recentAddresses.removeLast();
-            }
-          }
+          _addToRecentAddresses(_address);
         });
       } else {
         setState(() {
@@ -322,13 +325,25 @@ class _LocationScreenState extends State<LocationScreen> {
           _loading = false;
           _selectedMethod = "none";
         });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("No se encontró la dirección. Intenta con una dirección más específica."),
+            duration: Duration(seconds: 4),
+          ),
+        );
       }
     } catch (e) {
       setState(() {
-        _address = "Error buscando dirección: $e";
+        _address = "Error al buscar la dirección";
         _loading = false;
         _selectedMethod = "none";
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("No se pudo encontrar la dirección. Verifica la conexión o intenta con una dirección diferente."),
+          duration: const Duration(seconds: 4),
+        ),
+      );
     }
   }
   
