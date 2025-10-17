@@ -17,6 +17,7 @@ dependencies:
   geocoding: ^2.1.0  
   url_launcher: ^6.1.10
   font_awesome_flutter: 10.10.0
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../api_service.dart';
 import 'detalle_pedido_page.dart';
 import 'pago_page.dart'; // ⬅️ Importamos la pantalla de pago
+import 'cajero_dashboard_page.dart'; // ⬅️ Importamos el dashboard de cajero
 
 class PedidosCajeroPage extends StatefulWidget {
   const PedidosCajeroPage({Key? key}) : super(key: key);
@@ -67,6 +68,21 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          // Botón para acceder al módulo de caja completo
+          IconButton(
+            icon: const Icon(Icons.dashboard, size: 28),
+            tooltip: "Módulo de Caja",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CajeroDashboardPage(userId: _userId),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _pedidosPendientes,

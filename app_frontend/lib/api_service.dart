@@ -410,4 +410,92 @@ class ApiService {
     }
     return data;
   }
+
+  // ===============================
+  // 🔹 Cajero - Reportes y Estadísticas
+  // ===============================
+
+  /// Obtener ventas del día actual
+  Future<Map<String, dynamic>> obtenerVentasDelDia() async {
+    try {
+      final url = Uri.parse('$baseUrl/cajero/ventas/dia');
+      final response = await http.get(url, headers: {"Content-Type": "application/json"});
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          return Map<String, dynamic>.from(data);
+        } else {
+          throw Exception('Error al obtener ventas del día');
+        }
+      } else {
+        throw Exception('Error del servidor: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception("No se pudo conectar al backend: $e");
+    }
+  }
+
+  /// Obtener reporte de ventas por rango de fechas
+  Future<Map<String, dynamic>> obtenerReporteVentas(String fechaInicio, String fechaFin) async {
+    try {
+      final url = Uri.parse('$baseUrl/cajero/ventas/reporte?fecha_inicio=$fechaInicio&fecha_fin=$fechaFin');
+      final response = await http.get(url, headers: {"Content-Type": "application/json"});
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          return Map<String, dynamic>.from(data);
+        } else {
+          throw Exception('Error al obtener reporte de ventas');
+        }
+      } else {
+        throw Exception('Error del servidor: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception("No se pudo conectar al backend: $e");
+    }
+  }
+
+  /// Obtener historial de pagos
+  Future<Map<String, dynamic>> obtenerHistorialPagos({int limit = 50, int offset = 0}) async {
+    try {
+      final url = Uri.parse('$baseUrl/cajero/pagos/historial?limit=$limit&offset=$offset');
+      final response = await http.get(url, headers: {"Content-Type": "application/json"});
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          return Map<String, dynamic>.from(data);
+        } else {
+          throw Exception('Error al obtener historial de pagos');
+        }
+      } else {
+        throw Exception('Error del servidor: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception("No se pudo conectar al backend: $e");
+    }
+  }
+
+  /// Obtener estadísticas de caja
+  Future<Map<String, dynamic>> obtenerEstadisticasCaja() async {
+    try {
+      final url = Uri.parse('$baseUrl/cajero/estadisticas');
+      final response = await http.get(url, headers: {"Content-Type": "application/json"});
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          return Map<String, dynamic>.from(data);
+        } else {
+          throw Exception('Error al obtener estadísticas de caja');
+        }
+      } else {
+        throw Exception('Error del servidor: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception("No se pudo conectar al backend: $e");
+    }
+  }
 }
