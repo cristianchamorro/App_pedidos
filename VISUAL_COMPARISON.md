@@ -204,6 +204,7 @@
   - Chips de navegación rápida
   - Búsqueda instantánea
   - Filtrado combinado
+  - **Expansión automática**: Cuando se selecciona una categoría desde los chips, esa categoría se expande automáticamente para mostrar sus productos
 
 #### Información del Carrito
 - **Antes**: Solo botón flotante
