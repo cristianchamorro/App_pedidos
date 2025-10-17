@@ -18,11 +18,13 @@
 2. **user_admin** table with test users:
    ```sql
    -- Example test users
+   -- Note: role_id values should match the id from roles table
+   -- 1=admin, 2=cajero, 3=cocinero, 4=domiciliario
    INSERT INTO user_admin (username, password, name, role_id) VALUES
-   ('admin1', 'admin123', 'Administrator', 1),
-   ('cajero1', 'cajero123', 'Cashier User', 2),
-   ('cocinero1', 'cocinero123', 'Chef User', 3),
-   ('domiciliario1', 'dom123', 'Delivery Driver', 4);
+   ('admin1', 'admin123', 'Administrator', 1),      -- admin role
+   ('cajero1', 'cajero123', 'Cashier User', 2),     -- cajero role
+   ('cocinero1', 'cocinero123', 'Chef User', 3),    -- cocinero role
+   ('domiciliario1', 'dom123', 'Delivery Driver', 4); -- domiciliario role
    ```
 
 ## Test Scenarios

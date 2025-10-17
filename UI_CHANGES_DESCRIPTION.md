@@ -63,7 +63,7 @@ This document describes the visual improvements made to the login screens.
 - Plain background
 - Standard input fields
 - Basic error messages
-- Only supported 3 roles (admin, cajero, cocinero)
+- Supported 3 roles: admin, cajero, cocinero (missing domiciliario)
 
 ### After - Enhanced UI:
 
@@ -193,9 +193,9 @@ Now supports 4 roles with proper routing:
 - **Bold (700)**: Titles, button text
 
 ### Letter Spacing:
-- **1.05**: Domiciliario page
-- **1.1**: Location screen
-- **1.2**: Login pages
+- **1.05 spacing units**: Domiciliario page
+- **1.1 spacing units**: Location screen
+- **1.2 spacing units**: Login pages
 
 ## 6. Icons Used
 
