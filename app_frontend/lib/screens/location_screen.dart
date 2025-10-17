@@ -31,6 +31,7 @@ class _LocationScreenState extends State<LocationScreen> {
   // Store recent addresses (max 3, session-only storage)
   final List<String> _recentAddresses = [];
   static const int _maxRecentAddresses = 3;
+  static const int _minSearchLength = 3;
 
   bool get _isMobileOrDesktop =>
       !kIsWeb &&
@@ -280,9 +281,9 @@ class _LocationScreenState extends State<LocationScreen> {
       return;
     }
     
-    if (searchQuery.length < 3) {
+    if (searchQuery.length < _minSearchLength) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("La dirección debe tener al menos 3 caracteres")),
+        SnackBar(content: Text("La dirección debe tener al menos $_minSearchLength caracteres")),
       );
       return;
     }
@@ -327,8 +328,8 @@ class _LocationScreenState extends State<LocationScreen> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("No se encontró la dirección. Intenta con una dirección más específica."),
-            duration: Duration(seconds: 4),
+            content: Text("No se encontró la dirección. Intenta con más detalles."),
+            duration: Duration(seconds: 3),
           ),
         );
       }
@@ -340,8 +341,8 @@ class _LocationScreenState extends State<LocationScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("No se pudo encontrar la dirección. Verifica la conexión o intenta con una dirección diferente."),
-          duration: const Duration(seconds: 4),
+          content: Text("No se pudo buscar la dirección. Verifica tu conexión."),
+          duration: const Duration(seconds: 3),
         ),
       );
     }
