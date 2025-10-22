@@ -67,37 +67,97 @@ class _PagoPageState extends State<PagoPage> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Row(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Column(
           children: [
-            Icon(Icons.check_circle, color: Colors.green, size: 30),
-            SizedBox(width: 10),
-            Text("Pago Exitoso"),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.check_circle, color: Colors.green, size: 48),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              "Pago Exitoso",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
+            ),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Divider(),
-            _buildReciboItem("Pedido #", widget.pedidoId.toString()),
-            _buildReciboItem("Total", "\$${widget.total.toStringAsFixed(2)}"),
-            _buildReciboItem("Método de Pago", _metodoPago),
-            if (_metodoPago == 'Efectivo') ...[
-              _buildReciboItem("Efectivo Recibido", "\$${_efectivoController.text}"),
-              _buildReciboItem("Vuelto", "\$${_vuelto.toStringAsFixed(2)}"),
-            ],
-            const Divider(),
-            const SizedBox(height: 10),
-            const Text(
-              "El pedido pasó a preparación",
-              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.deepPurple.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  _buildReciboItem("Pedido #", widget.pedidoId.toString()),
+                  const Divider(height: 16),
+                  _buildReciboItem("Total", "\$${widget.total.toStringAsFixed(2)}"),
+                  const Divider(height: 16),
+                  _buildReciboItem("Método de Pago", _metodoPago),
+                  if (_metodoPago == 'Efectivo') ...[
+                    const Divider(height: 16),
+                    _buildReciboItem("Efectivo Recibido", "\$${_efectivoController.text}"),
+                    const Divider(height: 16),
+                    _buildReciboItem("Vuelto", "\$${_vuelto.toStringAsFixed(2)}"),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: const [
+                  Icon(Icons.info_outline, color: Colors.blue, size: 20),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "El pedido pasó a preparación",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text("Cerrar"),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: const Icon(Icons.check),
+              label: const Text("Cerrar"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -113,6 +173,58 @@ class _PagoPageState extends State<PagoPage> {
           Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
           Text(value, style: const TextStyle(fontSize: 16)),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentMethodTile(String value, IconData icon, Color color, String description) {
+    final isSelected = _metodoPago == value;
+    return Container(
+      decoration: BoxDecoration(
+        color: isSelected ? color.withOpacity(0.1) : null,
+        borderRadius: isSelected ? BorderRadius.circular(12) : null,
+      ),
+      child: RadioListTile<String>(
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        value: value,
+        groupValue: _metodoPago,
+        activeColor: color,
+        onChanged: (newValue) {
+          setState(() {
+            _metodoPago = newValue!;
+          });
+        },
       ),
     );
   }
@@ -165,26 +277,67 @@ class _PagoPageState extends State<PagoPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Total Card
+            // Total Card with gradient
             Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
+              elevation: 6,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(
+                    colors: [Colors.green.shade600, Colors.green.shade400],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.green.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      "Total a pagar:",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          "Total a pagar",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Pedido confirmado",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white60,
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      "\$${widget.total.toStringAsFixed(2)}",
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
-                      ),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.attach_money,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                        Text(
+                          "${widget.total.toStringAsFixed(2)}",
+                          style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -194,82 +347,53 @@ class _PagoPageState extends State<PagoPage> {
             const SizedBox(height: 24),
             
             // Payment Method Selection
-            const Text(
-              "Método de Pago",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              children: const [
+                Icon(Icons.payment, color: Colors.deepPurple, size: 24),
+                SizedBox(width: 8),
+                Text(
+                  "Método de Pago",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurple,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             
             Card(
-              elevation: 2,
+              elevation: 4,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: Column(
                 children: [
-                  RadioListTile<String>(
-                    title: const Row(
-                      children: [
-                        Icon(Icons.attach_money, color: Colors.green),
-                        SizedBox(width: 8),
-                        Text("Efectivo"),
-                      ],
-                    ),
-                    value: 'Efectivo',
-                    groupValue: _metodoPago,
-                    onChanged: (value) {
-                      setState(() {
-                        _metodoPago = value!;
-                      });
-                    },
+                  _buildPaymentMethodTile(
+                    'Efectivo',
+                    Icons.attach_money,
+                    Colors.green,
+                    "Pago en efectivo con cálculo de vuelto",
                   ),
                   const Divider(height: 1),
-                  RadioListTile<String>(
-                    title: const Row(
-                      children: [
-                        Icon(Icons.credit_card, color: Colors.blue),
-                        SizedBox(width: 8),
-                        Text("Tarjeta Débito"),
-                      ],
-                    ),
-                    value: 'Tarjeta Débito',
-                    groupValue: _metodoPago,
-                    onChanged: (value) {
-                      setState(() {
-                        _metodoPago = value!;
-                      });
-                    },
+                  _buildPaymentMethodTile(
+                    'Tarjeta Débito',
+                    Icons.credit_card,
+                    Colors.blue,
+                    "Pago con tarjeta de débito",
                   ),
                   const Divider(height: 1),
-                  RadioListTile<String>(
-                    title: const Row(
-                      children: [
-                        Icon(Icons.credit_card, color: Colors.orange),
-                        SizedBox(width: 8),
-                        Text("Tarjeta Crédito"),
-                      ],
-                    ),
-                    value: 'Tarjeta Crédito',
-                    groupValue: _metodoPago,
-                    onChanged: (value) {
-                      setState(() {
-                        _metodoPago = value!;
-                      });
-                    },
+                  _buildPaymentMethodTile(
+                    'Tarjeta Crédito',
+                    Icons.credit_card,
+                    Colors.orange,
+                    "Pago con tarjeta de crédito",
                   ),
                   const Divider(height: 1),
-                  RadioListTile<String>(
-                    title: const Row(
-                      children: [
-                        Icon(Icons.qr_code, color: Colors.purple),
-                        SizedBox(width: 8),
-                        Text("Transferencia/QR"),
-                      ],
-                    ),
-                    value: 'Transferencia',
-                    groupValue: _metodoPago,
-                    onChanged: (value) {
-                      setState(() {
-                        _metodoPago = value!;
-                      });
-                    },
+                  _buildPaymentMethodTile(
+                    'Transferencia',
+                    Icons.qr_code,
+                    Colors.purple,
+                    "Transferencia bancaria o código QR",
                   ),
                 ],
               ),
@@ -279,45 +403,100 @@ class _PagoPageState extends State<PagoPage> {
 
             // Cash input (only for Efectivo)
             if (_metodoPago == 'Efectivo') ...[
-              const Text(
-                "Efectivo Recibido",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              const SizedBox(height: 8),
+              Row(
+                children: const [
+                  Icon(Icons.payments, color: Colors.deepPurple, size: 24),
+                  SizedBox(width: 8),
+                  Text(
+                    "Efectivo Recibido",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.deepPurple,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
-              TextField(
-                controller: _efectivoController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: "Monto recibido",
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.attach_money),
-                  filled: true,
-                  fillColor: Colors.grey[100],
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: TextField(
+                    controller: _efectivoController,
+                    keyboardType: TextInputType.number,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    decoration: InputDecoration(
+                      labelText: "Monto en efectivo",
+                      hintText: "Ej: ${(widget.total + 10).toStringAsFixed(2)}",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      prefixIcon: Container(
+                        margin: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.attach_money, color: Colors.green),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[50],
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    ),
+                    onChanged: _calcularVuelto,
+                  ),
                 ),
-                onChanged: _calcularVuelto,
               ),
               const SizedBox(height: 16),
               
               // Change display
               Card(
-                elevation: 4,
-                color: Colors.green[50],
+                elevation: 6,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                child: Padding(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [Colors.teal.shade400, Colors.teal.shade600],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.teal.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "Vuelto:",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      Row(
+                        children: const [
+                          Icon(Icons.monetization_on, color: Colors.white, size: 28),
+                          SizedBox(width: 12),
+                          Text(
+                            "Vuelto",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                       Text(
                         "\$${_vuelto.toStringAsFixed(2)}",
-                        style: TextStyle(
-                          fontSize: 22,
+                        style: const TextStyle(
+                          fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.green[700],
+                          color: Colors.white,
                         ),
                       ),
                     ],
