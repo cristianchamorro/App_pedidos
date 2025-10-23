@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 import '../api_service.dart';
+import '../theme/app_theme.dart';
 import 'pago_page.dart';
+import '../theme/app_theme.dart';
 
 class DetallePedidoPage extends StatefulWidget {
   final int pedidoId;
@@ -40,7 +43,7 @@ class _DetallePedidoPageState extends State<DetallePedidoPage> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
+              colors: [AppTheme.primary, AppTheme.primaryLight],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -107,7 +110,7 @@ class _DetallePedidoPageState extends State<DetallePedidoPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       gradient: LinearGradient(
-                        colors: [Colors.deepPurple.withOpacity(0.1), Colors.white],
+                        colors: [AppTheme.primary.withOpacity(0.1), Colors.white],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -118,14 +121,14 @@ class _DetallePedidoPageState extends State<DetallePedidoPage> {
                       children: [
                         Row(
                           children: const [
-                            Icon(Icons.person, color: Colors.deepPurple, size: 24),
+                            Icon(Icons.person, color: AppTheme.primary, size: 24),
                             SizedBox(width: 8),
                             Text(
                               "Información del Cliente",
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.deepPurple,
+                                color: AppTheme.primary,
                               ),
                             ),
                           ],
@@ -258,21 +261,21 @@ class _DetallePedidoPageState extends State<DetallePedidoPage> {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.shopping_basket, color: Colors.deepPurple, size: 24),
+                            const Icon(Icons.shopping_basket, color: AppTheme.primary, size: 24),
                             const SizedBox(width: 8),
                             const Text(
                               "Productos del Pedido",
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.deepPurple,
+                                color: AppTheme.primary,
                               ),
                             ),
                             const Spacer(),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                               decoration: BoxDecoration(
-                                color: Colors.deepPurple,
+                                color: AppTheme.primary,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
@@ -294,10 +297,10 @@ class _DetallePedidoPageState extends State<DetallePedidoPage> {
                           return Container(
                             margin: const EdgeInsets.only(bottom: 8),
                             decoration: BoxDecoration(
-                              color: Colors.deepPurple.withOpacity(0.05),
+                              color: AppTheme.primary.withOpacity(0.05),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: Colors.deepPurple.withOpacity(0.2),
+                                color: AppTheme.primary.withOpacity(0.2),
                                 width: 1,
                               ),
                             ),
@@ -305,12 +308,12 @@ class _DetallePedidoPageState extends State<DetallePedidoPage> {
                               leading: Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.deepPurple.withOpacity(0.1),
+                                  color: AppTheme.primary.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: const Icon(
                                   Icons.fastfood,
-                                  color: Colors.deepPurple,
+                                  color: AppTheme.primary,
                                 ),
                               ),
                               title: Text(
@@ -419,7 +422,7 @@ class _DetallePedidoPageState extends State<DetallePedidoPage> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 20, color: Colors.deepPurple),
+        Icon(icon, size: 20, color: AppTheme.primary),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -460,7 +463,7 @@ class _DetallePedidoPageState extends State<DetallePedidoPage> {
       case 'listo':
         return Colors.teal;
       case 'entregado':
-        return Colors.purple;
+        return AppTheme.accent;
       case 'cancelado':
         return Colors.red;
       default:

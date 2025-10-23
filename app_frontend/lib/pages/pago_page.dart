@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 import '../api_service.dart';
+import '../theme/app_theme.dart';
 
 class PagoPage extends StatefulWidget {
   final int pedidoId;
@@ -96,7 +98,7 @@ class _PagoPageState extends State<PagoPage> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.deepPurple.withOpacity(0.05),
+                color: AppTheme.primary.withOpacity(0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -150,7 +152,7 @@ class _PagoPageState extends State<PagoPage> {
               icon: const Icon(Icons.check),
               label: const Text("Cerrar"),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: AppTheme.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -254,7 +256,7 @@ class _PagoPageState extends State<PagoPage> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
+              colors: [AppTheme.primary, AppTheme.primaryLight],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -349,14 +351,14 @@ class _PagoPageState extends State<PagoPage> {
             // Payment Method Selection
             Row(
               children: const [
-                Icon(Icons.payment, color: Colors.deepPurple, size: 24),
+                Icon(Icons.payment, color: AppTheme.primary, size: 24),
                 SizedBox(width: 8),
                 Text(
                   "Método de Pago",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple,
+                    color: AppTheme.primary,
                   ),
                 ),
               ],
@@ -392,7 +394,7 @@ class _PagoPageState extends State<PagoPage> {
                   _buildPaymentMethodTile(
                     'Transferencia',
                     Icons.qr_code,
-                    Colors.purple,
+                    AppTheme.accent,
                     "Transferencia bancaria o código QR",
                   ),
                 ],
@@ -406,14 +408,14 @@ class _PagoPageState extends State<PagoPage> {
               const SizedBox(height: 8),
               Row(
                 children: const [
-                  Icon(Icons.payments, color: Colors.deepPurple, size: 24),
+                  Icon(Icons.payments, color: AppTheme.primary, size: 24),
                   SizedBox(width: 8),
                   Text(
                     "Efectivo Recibido",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
+                      color: AppTheme.primary,
                     ),
                   ),
                 ],
