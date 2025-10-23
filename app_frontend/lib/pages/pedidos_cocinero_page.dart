@@ -188,6 +188,18 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
+          // Navigate to ready orders
+          IconButton(
+            icon: const Icon(Icons.check_circle, color: Colors.white),
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                '/pedidos-listos',
+                arguments: {'userId': _userId},
+              );
+            },
+            tooltip: 'Ver pedidos listos',
+          ),
           // Filtro dropdown
           PopupMenuButton<String>(
             icon: const Icon(Icons.filter_list, color: Colors.white),
