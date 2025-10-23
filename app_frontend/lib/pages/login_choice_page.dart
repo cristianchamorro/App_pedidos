@@ -139,6 +139,34 @@ class LoginChoicePage extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 20),
+              // Display Screen Button (for customer-facing display)
+              SizedBox(
+                width: double.infinity,
+                height: 60,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    elevation: 5,
+                    shadowColor: Colors.green.withOpacity(0.5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(
+                      context,
+                      '/pedidos-listos',
+                    );
+                  },
+                  icon: const Icon(Icons.tv, size: 28),
+                  label: const Text(
+                    "Pantalla de Pedidos Listos",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
