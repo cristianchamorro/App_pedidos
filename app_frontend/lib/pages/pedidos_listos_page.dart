@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../api_service.dart';
 
 class PedidosListosPage extends StatefulWidget {
@@ -17,6 +18,11 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
   int? _userId;
 
   // Sample video URLs - these can be configured dynamically in the future
+  // Similar to how product images are handled with imageUrl field
+  // You can:
+  // 1. Add a videos table in the database with fields: id, title, url, thumbnail_url
+  // 2. Create an API endpoint to fetch videos (e.g., GET /api/videos)
+  // 3. Replace this static list with API call: await api.fetchVideos()
   final List<Map<String, String>> videos = [
     {
       'title': 'Tutorial de Preparación',
@@ -68,6 +74,19 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
     } catch (e) {
       if (mounted) {
         setState(() => isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _abrirVideo(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("No se pudo abrir el video: $url")),
+        );
       }
     }
   }
@@ -559,14 +578,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: InkWell(
-                              onTap: () {
-                                // In a real implementation, you would open the video URL
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text("Abriendo: ${video['title']}"),
-                                  ),
-                                );
-                              },
+                              onTap: () => _abrirVideo(video['url']!),
                               borderRadius: BorderRadius.circular(10),
                               child: Padding(
                                 padding: const EdgeInsets.all(12.0),
