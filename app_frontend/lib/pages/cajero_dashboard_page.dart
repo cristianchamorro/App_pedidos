@@ -152,7 +152,7 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
               "Mes",
               "\$${_formatNumber(mes['total_mes'])}",
               "${mes['pedidos_mes']} pedidos",
-              Colors.purple,
+              AppTheme.accent,
               Icons.calendar_month,
             ),
             _buildStatCard(
@@ -442,7 +442,7 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
       case 'listo':
         return const Icon(Icons.check_circle, color: Colors.teal, size: 18);
       case 'entregado':
-        return const Icon(Icons.delivery_dining, color: Colors.purple, size: 18);
+        return const Icon(Icons.delivery_dining, color: AppTheme.accent, size: 18);
       case 'cancelado':
         return const Icon(Icons.cancel, color: Colors.red, size: 18);
       default:
