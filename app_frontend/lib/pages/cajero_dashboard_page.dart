@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../api_service.dart';
 import 'package:intl/intl.dart';
+import '../theme/app_theme.dart';
 
 class CajeroDashboardPage extends StatefulWidget {
   final int? userId;
@@ -60,13 +61,9 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
         elevation: 8,
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.vertical(
+          decoration: BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+            borderRadius: const BorderRadius.vertical(
               bottom: Radius.circular(20),
             ),
             boxShadow: [
@@ -253,7 +250,7 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
     return ElevatedButton.icon(
       onPressed: () => setState(() => _selectedTabIndex = index),
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected ? Colors.deepPurple : Colors.grey[300],
+        backgroundColor: isSelected ? AppTheme.primary : Colors.grey[300],
         foregroundColor: isSelected ? Colors.white : Colors.black87,
         padding: const EdgeInsets.symmetric(vertical: 12),
         shape: RoundedRectangleBorder(
@@ -362,7 +359,7 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
             ElevatedButton.icon(
               onPressed: () => _mostrarHistorialCompleto(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: AppTheme.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
               ),
@@ -490,7 +487,7 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.deepPurple,
+                    color: AppTheme.primary,
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                   ),
                   child: Row(
@@ -574,8 +571,8 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.deepPurple,
+            colorScheme: ColorScheme.light(
+              primary: AppTheme.primary,
             ),
           ),
           child: child!,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../api_service.dart';
 
+import '../theme/app_theme.dart';
 class DomiciliarioPage extends StatefulWidget {
   const DomiciliarioPage({super.key});
 
@@ -26,7 +27,7 @@ class _DomiciliarioPageState extends State<DomiciliarioPage> {
   StreamSubscription<Position>? _posSub;
 
   // Estilos reutilizables
-  Color get _primary => Colors.deepPurple;
+  Color get _primary => AppTheme.primary;
   ButtonStyle get _btnPrimary => ElevatedButton.styleFrom(
     backgroundColor: _primary,
     foregroundColor: Colors.white,
@@ -218,7 +219,7 @@ class _DomiciliarioPageState extends State<DomiciliarioPage> {
   Widget build(BuildContext context) {
     final d = _driver;
     return Scaffold(
-      backgroundColor: Colors.deepPurple[50],
+      backgroundColor: AppTheme.primaryVeryLight,
       appBar: AppBar(
         title: const Text(
           'Domiciliario',
@@ -234,7 +235,7 @@ class _DomiciliarioPageState extends State<DomiciliarioPage> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
+              colors: [AppTheme.primary, AppTheme.primaryLight],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),

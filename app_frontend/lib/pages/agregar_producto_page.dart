@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 import '../models/categoria.dart';
+import '../theme/app_theme.dart';
 import '../models/vendor.dart';
+import '../theme/app_theme.dart';
 import '../models/product.dart';
+import '../theme/app_theme.dart';
 import '../api_service.dart';
+import '../theme/app_theme.dart';
 
 class AgregarProductoPage extends StatefulWidget {
   const AgregarProductoPage({Key? key}) : super(key: key);
@@ -202,7 +207,7 @@ class _AgregarProductoPageState extends State<AgregarProductoPage> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
+              colors: [AppTheme.primary, AppTheme.primaryLight],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -345,7 +350,7 @@ class _AgregarProductoPageState extends State<AgregarProductoPage> {
                       : ElevatedButton(
                           onPressed: _guardarProducto,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurple,
+                            backgroundColor: AppTheme.primary,
                             minimumSize: const Size.fromHeight(50),
                           ),
                           child: Text(

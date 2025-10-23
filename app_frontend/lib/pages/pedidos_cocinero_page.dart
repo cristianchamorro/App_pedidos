@@ -1,5 +1,6 @@
 import 'dart:async'; // 👈 Importante
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 import '../api_service.dart';
 
 class PedidosCocineroPage extends StatefulWidget {
@@ -153,7 +154,7 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.deepPurple[50],
+      backgroundColor: AppTheme.primaryVeryLight,
       appBar: AppBar(
         title: const Text(
           "Cocina - Pedidos en preparación",
@@ -170,7 +171,7 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
+              colors: [AppTheme.primary, AppTheme.primaryLight],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -274,7 +275,7 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.deepPurple.shade100, Colors.white],
+                colors: [AppTheme.primaryVeryLight, Colors.white],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -294,7 +295,7 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
                   icon: Icons.restaurant_menu,
                   label: 'Total',
                   value: pedidos.length.toString(),
-                  color: Colors.deepPurple,
+                  color: AppTheme.primary,
                 ),
                 _buildStatCard(
                   icon: Icons.warning,
@@ -393,12 +394,12 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
                                                   Container(
                                                     padding: const EdgeInsets.all(8),
                                                     decoration: BoxDecoration(
-                                                      color: Colors.deepPurple.withOpacity(0.1),
+                                                      color: AppTheme.primary.withOpacity(0.1),
                                                       borderRadius: BorderRadius.circular(8),
                                                     ),
                                                     child: const Icon(
                                                       Icons.receipt_long,
-                                                      color: Colors.deepPurple,
+                                                      color: AppTheme.primary,
                                                       size: 24,
                                                     ),
                                                   ),
@@ -578,7 +579,7 @@ class _PedidosCocineroPageState extends State<PedidosCocineroPage> {
                                                     Container(
                                                       padding: const EdgeInsets.all(8),
                                                       decoration: BoxDecoration(
-                                                        color: Colors.deepPurple,
+                                                        color: AppTheme.primary,
                                                         borderRadius: BorderRadius.circular(8),
                                                       ),
                                                       child: Text(

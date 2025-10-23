@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import '../api_service.dart';
 import '../models/product.dart';
+import '../theme/app_theme.dart';
 
 class LocationScreen extends StatefulWidget {
   final String role;
@@ -392,7 +393,7 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.deepPurple[50],
+      backgroundColor: AppTheme.primaryVeryLight,
       appBar: AppBar(
         title: const Text(
           "Captura tu ubicación",
@@ -407,13 +408,9 @@ class _LocationScreenState extends State<LocationScreen> {
         elevation: 8,
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.vertical(
+          decoration: BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+            borderRadius: const BorderRadius.vertical(
               bottom: Radius.circular(20),
             ),
             boxShadow: [
@@ -443,7 +440,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.deepPurple.shade100,
+                      AppTheme.primaryVeryLight,
                       Colors.white,
                     ],
                     begin: Alignment.topLeft,
@@ -606,12 +603,12 @@ class _LocationScreenState extends State<LocationScreen> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.purple.withOpacity(0.1),
+                            color: AppTheme.accent.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(
                             Icons.search,
-                            color: Colors.purple,
+                            color: AppTheme.accent,
                             size: 24,
                           ),
                         ),
@@ -662,7 +659,7 @@ class _LocationScreenState extends State<LocationScreen> {
                       child: ElevatedButton.icon(
                         onPressed: _searchAddress,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple,
+                          backgroundColor: AppTheme.accent,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -837,12 +834,12 @@ class _LocationScreenState extends State<LocationScreen> {
                     ? _continueToProducts 
                     : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
+                  backgroundColor: AppTheme.primary,
                   foregroundColor: Colors.white,
                   disabledBackgroundColor: Colors.grey.shade300,
                   disabledForegroundColor: Colors.grey.shade600,
                   elevation: _locationConfirmed ? 5 : 0,
-                  shadowColor: Colors.deepPurple.withOpacity(0.5),
+                  shadowColor: AppTheme.primary.withOpacity(0.5),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
