@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 import 'package:app_pedidos/models/product.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -178,7 +179,7 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
+              colors: [AppTheme.primaryColor, AppTheme.primaryLightColor],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -242,7 +243,7 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
                   leading: producto.imageUrl != null
                       ? Image.network(producto.imageUrl!,
                       width: 40, height: 40, fit: BoxFit.cover)
-                      : const Icon(Icons.shopping_bag, color: Colors.deepPurple),
+                      : const Icon(Icons.shopping_bag, color: AppTheme.primaryColor),
                   title: Text(producto.name),
                   subtitle: Text(
                     'Cantidad: ${producto.cantidad} | Vendedor: ${producto.vendorName ?? 'N/A'} | Driver: ${producto.driverName ?? 'N/A'}',
@@ -281,7 +282,7 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : confirmarPedido,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
+                  backgroundColor: AppTheme.primaryColor,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

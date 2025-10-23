@@ -6,6 +6,7 @@ import 'package:app_pedidos/pages/confirmar_pedido_page.dart';
 import 'package:app_pedidos/pages/pedidos_cajero_page.dart';   //
 import 'package:app_pedidos/pages/pedidos_cocinero_page.dart'; //
 import 'package:geolocator/geolocator.dart';
+import '../theme/app_theme.dart';
 
 class ProductosPorCategoriaPage extends StatefulWidget {
   final List<Product> productos;
@@ -198,26 +199,13 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
       appBar: AppBar(
         title: const Text(
           "Lista de Productos",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-          ),
+          style: AppTheme.appBarTitleStyle,
         ),
         centerTitle: true, // centrar el título
         elevation: 6, // sombra
         backgroundColor: Colors.transparent, // transparente porque usamos flexibleSpace
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(20),
-            ),
-          ),
+          decoration: AppTheme.appBarDecoration,
         ),
         iconTheme: const IconThemeData(color: Colors.white), // iconos blancos
         actions: [
@@ -326,7 +314,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
               },
               decoration: InputDecoration(
                 hintText: 'Buscar productos...',
-                prefixIcon: const Icon(Icons.search, color: Colors.deepPurple),
+                prefixIcon: const Icon(Icons.search, color: AppTheme.primaryColor),
                 suffixIcon: searchQuery.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear),
@@ -338,7 +326,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                       )
                     : null,
                 filled: true,
-                fillColor: Colors.deepPurple.withOpacity(0.05),
+                fillColor: AppTheme.primaryColor.withOpacity(0.05),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide.none,
@@ -376,7 +364,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                         style: TextStyle(
                           color: categoriaSeleccionada == null
                               ? Colors.white
-                              : Colors.deepPurple,
+                              : AppTheme.primaryColor,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -386,11 +374,11 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                           categoriaSeleccionada = null;
                         });
                       },
-                      selectedColor: Colors.deepPurple,
+                      selectedColor: AppTheme.primaryColor,
                       backgroundColor: Colors.grey.shade200,
                       checkmarkColor: Colors.white,
                       elevation: 2,
-                      shadowColor: Colors.deepPurple.withOpacity(0.3),
+                      shadowColor: AppTheme.primaryColor.withOpacity(0.3),
                     ),
                   ),
                   // Category chips
@@ -405,7 +393,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                         label: Text(
                           '$categoria ($count)',
                           style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.deepPurple,
+                            color: isSelected ? Colors.white : AppTheme.primaryColor,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -415,11 +403,11 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                             categoriaSeleccionada = selected ? categoria : null;
                           });
                         },
-                        selectedColor: Colors.deepPurple,
+                        selectedColor: AppTheme.primaryColor,
                         backgroundColor: Colors.grey.shade200,
                         checkmarkColor: Colors.white,
                         elevation: 2,
-                        shadowColor: Colors.deepPurple.withOpacity(0.3),
+                        shadowColor: AppTheme.primaryColor.withOpacity(0.3),
                       ),
                     );
                   }).toList(),
@@ -436,7 +424,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                 children: [
                   // Dirección editable
                   Card(
-                    color: Colors.deepPurple.withOpacity(0.1),
+                    color: AppTheme.primaryColor.withOpacity(0.1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -446,7 +434,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.location_on, color: Colors.deepPurple),
+                          const Icon(Icons.location_on, color: AppTheme.primaryColor),
                           const SizedBox(width: 8),
                           Expanded(
                             child: TextField(
@@ -475,14 +463,14 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Colors.deepPurple.shade400, Colors.deepPurple.shade600],
+                          colors: [AppTheme.primaryColor.shade400, AppTheme.primaryColor.shade600],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.deepPurple.withOpacity(0.3),
+                            color: AppTheme.primaryColor.withOpacity(0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -524,7 +512,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                             label: const Text('Ver Carrito'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
-                              foregroundColor: Colors.deepPurple,
+                              foregroundColor: AppTheme.primaryColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -546,19 +534,19 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: ExpansionTile(
-                  backgroundColor: Colors.deepPurple.withOpacity(0.05),
-                  collapsedBackgroundColor: Colors.deepPurple.withOpacity(0.03),
+                  backgroundColor: AppTheme.primaryColor.withOpacity(0.05),
+                  collapsedBackgroundColor: AppTheme.primaryColor.withOpacity(0.03),
                   initiallyExpanded: categoriaSeleccionada == categoryName,
                   leading: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.deepPurple.withOpacity(0.1),
+                      color: AppTheme.primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.category, color: Colors.deepPurple),
+                    child: const Icon(Icons.category, color: AppTheme.primaryColor),
                   ),
                   trailing: const Icon(Icons.keyboard_arrow_down,
-                      color: Colors.deepPurple),
+                      color: AppTheme.primaryColor),
                   title: Row(
                     children: [
                       Expanded(
@@ -567,13 +555,13 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                           style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: Colors.deepPurple),
+                              color: AppTheme.primaryColor),
                         ),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.deepPurple,
+                          color: AppTheme.primaryColor,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -623,7 +611,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                   borderRadius: BorderRadius.circular(16),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.deepPurple.withOpacity(0.25),
+                                      color: AppTheme.primaryColor.withOpacity(0.25),
                                       blurRadius: 8,
                                       offset: const Offset(0, 4),
                                     ),
@@ -758,7 +746,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                                   style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 15,
-                                                    color: Colors.deepPurple,
+                                                    color: AppTheme.primaryColor,
                                                   ),
                                                   textAlign: TextAlign.center,
                                                   maxLines: 2,
@@ -894,7 +882,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                                       ],
                                                     ),
                                                     style: ElevatedButton.styleFrom(
-                                                      backgroundColor: Colors.deepPurple,
+                                                      backgroundColor: AppTheme.primaryColor,
                                                       foregroundColor: Colors.white,
                                                       padding: const EdgeInsets.symmetric(vertical: 8),
                                                       shape: RoundedRectangleBorder(
@@ -935,7 +923,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
           'Confirmar Pedido',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: AppTheme.primaryColor,
       ),
     );
   }
