@@ -1,7 +1,8 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../api_service.dart';
+import '../models/product.dart';
 
 class PedidosListosPage extends StatefulWidget {
   const PedidosListosPage({super.key});
@@ -13,37 +14,34 @@ class PedidosListosPage extends StatefulWidget {
 class _PedidosListosPageState extends State<PedidosListosPage> {
   final ApiService api = ApiService();
   List<Map<String, dynamic>> pedidos = [];
+  List<Product> productos = [];
   bool isLoading = true;
-  Timer? _timer;
+  Timer? _refreshTimer;
+  Timer? _carouselTimer;
   int? _userId;
-
-  // Sample video URLs - these can be configured dynamically in the future
-  // Similar to how product images are handled with imageUrl field
-  // You can:
-  // 1. Add a videos table in the database with fields: id, title, url, thumbnail_url
-  // 2. Create an API endpoint to fetch videos (e.g., GET /api/videos)
-  // 3. Replace this static list with API call: await api.fetchVideos()
-  final List<Map<String, String>> videos = [
-    {
-      'title': 'Tutorial de Preparación',
-      'url': 'https://www.youtube.com/watch?v=example1',
-      'thumbnail': 'https://via.placeholder.com/300x200?text=Video+1',
-    },
-    {
-      'title': 'Recetas Especiales',
-      'url': 'https://www.youtube.com/watch?v=example2',
-      'thumbnail': 'https://via.placeholder.com/300x200?text=Video+2',
-    },
-  ];
+  int _currentCarouselIndex = 0;
+  final PageController _pageController = PageController();
 
   @override
   void initState() {
     super.initState();
-    _cargarPedidos();
+    _cargarDatos();
 
-    // Refresh every 5 seconds
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    // Refresh orders every 10 seconds
+    _refreshTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
       _cargarPedidos();
+    });
+
+    // Auto-advance carousel every 5 seconds
+    _carouselTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (productos.isNotEmpty && _pageController.hasClients) {
+        final nextPage = (_currentCarouselIndex + 1) % productos.length;
+        _pageController.animateToPage(
+          nextPage,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
     });
   }
 
@@ -58,8 +56,17 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _refreshTimer?.cancel();
+    _carouselTimer?.cancel();
+    _pageController.dispose();
     super.dispose();
+  }
+
+  Future<void> _cargarDatos() async {
+    await Future.wait([
+      _cargarPedidos(),
+      _cargarProductos(),
+    ]);
   }
 
   Future<void> _cargarPedidos() async {
@@ -78,16 +85,19 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
     }
   }
 
-  Future<void> _abrirVideo(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
+  Future<void> _cargarProductos() async {
+    try {
+      final data = await api.fetchProducts();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("No se pudo abrir el video: $url")),
-        );
+        // Shuffle products for random display
+        final shuffled = List<Product>.from(data);
+        shuffled.shuffle(Random());
+        setState(() {
+          productos = shuffled;
+        });
       }
+    } catch (e) {
+      print('Error al cargar productos: $e');
     }
   }
 
@@ -107,7 +117,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
       backgroundColor: Colors.green[50],
       appBar: AppBar(
         title: const Text(
-          "Pedidos Listos para Entrega",
+          "Pedidos Listos - Para Recoger",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -141,7 +151,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: _cargarPedidos,
+            onPressed: _cargarDatos,
             tooltip: 'Actualizar',
           ),
         ],
@@ -191,7 +201,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
                               ),
                             ),
                             const Text(
-                              'Esperando entrega',
+                              'Para recoger',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey,
@@ -529,127 +539,167 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
                       );
                     }).toList(),
 
-                  // Videos section
-                  Container(
-                    margin: const EdgeInsets.all(12),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.purple.shade100, Colors.white],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                  // Product carousel section (advertisement-style)
+                  if (productos.isNotEmpty)
+                    Container(
+                      margin: const EdgeInsets.all(12),
+                      height: 300,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: PageView.builder(
+                          controller: _pageController,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentCarouselIndex = index;
+                            });
+                          },
+                          itemCount: productos.length,
+                          itemBuilder: (context, index) {
+                            final producto = productos[index];
+                            return _buildProductoCarouselItem(producto);
+                          },
                         ),
-                      ],
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Row(
-                          children: [
-                            Icon(
-                              Icons.video_library,
-                              color: Colors.purple,
-                              size: 28,
+
+                  // Page indicator dots
+                  if (productos.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          productos.length,
+                          (index) => Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _currentCarouselIndex == index
+                                  ? Colors.green
+                                  : Colors.grey.shade300,
                             ),
-                            SizedBox(width: 12),
-                            Text(
-                              'Videos y Recursos',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.purple,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        ...videos.map((video) {
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: InkWell(
-                              onTap: () => _abrirVideo(video['url']!),
-                              borderRadius: BorderRadius.circular(10),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 80,
-                                      height: 60,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade300,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: const Icon(
-                                        Icons.play_circle_filled,
-                                        color: Colors.purple,
-                                        size: 40,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            video['title']!,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            video['url']!,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey.shade600,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const Icon(
-                                      Icons.arrow_forward_ios,
-                                      size: 16,
-                                      color: Colors.grey,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Nota: Los videos se pueden configurar dinámicamente cargando URLs similares a como actualmente se cargan las imágenes.',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
-                            fontStyle: FontStyle.italic,
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
 
                   const SizedBox(height: 16),
                 ],
               ),
             ),
+    );
+  }
+
+  Widget _buildProductoCarouselItem(Product producto) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.orange.shade100, Colors.white],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Product image
+          if (producto.imageUrl != null && producto.imageUrl!.isNotEmpty)
+            Container(
+              width: double.infinity,
+              height: 180,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+              ),
+              child: Image.network(
+                producto.imageUrl!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey.shade300,
+                    child: const Icon(
+                      Icons.restaurant,
+                      size: 80,
+                      color: Colors.grey,
+                    ),
+                  );
+                },
+              ),
+            )
+          else
+            Container(
+              width: double.infinity,
+              height: 180,
+              color: Colors.grey.shade300,
+              child: const Icon(
+                Icons.restaurant,
+                size: 80,
+                color: Colors.grey,
+              ),
+            ),
+          
+          const SizedBox(height: 16),
+          
+          // Product info
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Column(
+              children: [
+                Text(
+                  producto.name,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                if (producto.description != null && producto.description!.isNotEmpty)
+                  Text(
+                    producto.description!,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade700,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  child: Text(
+                    '\$${producto.price.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
