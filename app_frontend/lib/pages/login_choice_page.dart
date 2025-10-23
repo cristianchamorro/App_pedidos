@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/location_screen.dart';
 import 'login_admin_page.dart';
+import '../theme/app_theme.dart';
 
 class LoginChoicePage extends StatelessWidget {
   const LoginChoicePage({super.key});
@@ -8,38 +9,17 @@ class LoginChoicePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.deepPurple[50],
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         title: const Text(
           "Bienvenido",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-            letterSpacing: 1.2,
-          ),
+          style: AppTheme.appBarTitleStyle,
         ),
         centerTitle: true,
         elevation: 8,
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(20),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 8,
-                offset: Offset(0, 4),
-              )
-            ],
-          ),
+          decoration: AppTheme.appBarDecoration,
         ),
       ),
       body: Center(
@@ -56,7 +36,7 @@ class LoginChoicePage extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.deepPurple.withOpacity(0.3),
+                      color: AppTheme.primaryColor.withOpacity(0.3),
                       blurRadius: 15,
                       spreadRadius: 5,
                     ),
@@ -65,7 +45,7 @@ class LoginChoicePage extends StatelessWidget {
                 child: const Icon(
                   Icons.restaurant_menu,
                   size: 80,
-                  color: Colors.deepPurple,
+                  color: AppTheme.primaryColor,
                 ),
               ),
               const SizedBox(height: 40),
@@ -85,10 +65,10 @@ class LoginChoicePage extends StatelessWidget {
                 height: 60,
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
+                    backgroundColor: AppTheme.primaryColor,
                     foregroundColor: Colors.white,
                     elevation: 5,
-                    shadowColor: Colors.deepPurple.withOpacity(0.5),
+                    shadowColor: AppTheme.primaryColor.withOpacity(0.5),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
@@ -116,10 +96,10 @@ class LoginChoicePage extends StatelessWidget {
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    foregroundColor: Colors.deepPurple,
+                    foregroundColor: AppTheme.primaryColor,
                     elevation: 5,
-                    shadowColor: Colors.deepPurple.withOpacity(0.3),
-                    side: const BorderSide(color: Colors.deepPurple, width: 2),
+                    shadowColor: AppTheme.primaryColor.withOpacity(0.3),
+                    side: const BorderSide(color: AppTheme.primaryColor, width: 2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),

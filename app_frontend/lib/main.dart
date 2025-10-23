@@ -20,9 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'App Pedidos',
-      theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-      ),
+      theme: AppTheme.theme,
       home: const LoginChoicePage(), // ✅ pantalla inicial unificada
       routes: {
         '/location': (context) {
