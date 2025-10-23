@@ -159,12 +159,12 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Colors.deepPurple.withOpacity(0.1),
+                                      color: AppTheme.primaryColor.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: const Icon(
                                       Icons.receipt_long,
-                                      color: Colors.deepPurple,
+                                      color: AppTheme.primaryColor,
                                       size: 24,
                                     ),
                                   ),
@@ -177,7 +177,7 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.deepPurple,
+                                          color: AppTheme.primaryColor,
                                         ),
                                       ),
                                       const SizedBox(height: 2),
@@ -234,7 +234,7 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                           // Customer information
                           Row(
                             children: [
-                              const Icon(Icons.person, size: 18, color: Colors.deepPurple),
+                              const Icon(Icons.person, size: 18, color: AppTheme.primaryColor),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -251,7 +251,7 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                           
                           Row(
                             children: [
-                              const Icon(Icons.phone, size: 18, color: Colors.deepPurple),
+                              const Icon(Icons.phone, size: 18, color: AppTheme.primaryColor),
                               const SizedBox(width: 8),
                               Text(
                                 pedido['cliente_telefono'] ?? 'Sin teléfono',
@@ -267,7 +267,7 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(Icons.location_on, size: 18, color: Colors.deepPurple),
+                              const Icon(Icons.location_on, size: 18, color: AppTheme.primaryColor),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -310,8 +310,8 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                                   icon: const Icon(Icons.visibility, size: 18),
                                   label: const Text("Ver Detalle"),
                                   style: OutlinedButton.styleFrom(
-                                    foregroundColor: Colors.deepPurple,
-                                    side: const BorderSide(color: Colors.deepPurple),
+                                    foregroundColor: AppTheme.primaryColor,
+                                    side: const BorderSide(color: AppTheme.primaryColor),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),

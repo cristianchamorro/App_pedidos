@@ -233,7 +233,7 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
     return ElevatedButton.icon(
       onPressed: () => setState(() => _selectedTabIndex = index),
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected ? Colors.deepPurple : Colors.grey[300],
+        backgroundColor: isSelected ? AppTheme.primaryColor : Colors.grey[300],
         foregroundColor: isSelected ? Colors.white : Colors.black87,
         padding: const EdgeInsets.symmetric(vertical: 12),
         shape: RoundedRectangleBorder(
@@ -342,7 +342,7 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
             ElevatedButton.icon(
               onPressed: () => _mostrarHistorialCompleto(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: AppTheme.primaryColor,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
               ),
@@ -470,7 +470,7 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.deepPurple,
+                    color: AppTheme.primaryColor,
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                   ),
                   child: Row(
@@ -555,7 +555,7 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Colors.deepPurple,
+              primary: AppTheme.primaryColor,
             ),
           ),
           child: child!,

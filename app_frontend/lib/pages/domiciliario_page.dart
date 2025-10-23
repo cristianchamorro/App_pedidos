@@ -219,7 +219,7 @@ class _DomiciliarioPageState extends State<DomiciliarioPage> {
   Widget build(BuildContext context) {
     final d = _driver;
     return Scaffold(
-      backgroundColor: Colors.deepPurple[50],
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         title: const Text(
           'Domiciliario',
