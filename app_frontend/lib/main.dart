@@ -7,6 +7,7 @@ import 'package:app_pedidos/pages/login_admin_page.dart';
 import 'pages/pedidos_cocinero_page.dart';
 import 'package:app_pedidos/pages/pedidos_cajero_page.dart';
 import 'package:app_pedidos/pages/domiciliario_page.dart';
+import 'package:app_pedidos/pages/pedidos_listos_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -66,6 +67,11 @@ class MyApp extends StatelessWidget {
           final args =
               ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return const DomiciliarioPage();
+        },
+        '/pedidos-listos': (context) {
+          final args =
+              ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return const PedidosListosPage();
         },
       },
     );
