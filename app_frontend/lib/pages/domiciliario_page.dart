@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../api_service.dart';
+import '../theme/app_theme.dart';
 
 class DomiciliarioPage extends StatefulWidget {
   const DomiciliarioPage({super.key});
@@ -26,7 +27,7 @@ class _DomiciliarioPageState extends State<DomiciliarioPage> {
   StreamSubscription<Position>? _posSub;
 
   // Estilos reutilizables
-  Color get _primary => Colors.deepPurple;
+  Color get _primary => AppTheme.deliveryColor;
   ButtonStyle get _btnPrimary => ElevatedButton.styleFrom(
     backgroundColor: _primary,
     foregroundColor: Colors.white,
@@ -222,33 +223,13 @@ class _DomiciliarioPageState extends State<DomiciliarioPage> {
       appBar: AppBar(
         title: const Text(
           'Domiciliario',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.05,
-          ),
+          style: AppTheme.appBarTitleStyle,
         ),
         centerTitle: true,
         elevation: 8,
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(20),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 8,
-                offset: Offset(0, 4),
-              )
-            ],
-          ),
+          decoration: AppTheme.appBarDecoration,
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),

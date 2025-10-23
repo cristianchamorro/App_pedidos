@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../api_service.dart';
 import 'package:intl/intl.dart';
+import '../theme/app_theme.dart';
 
 class CajeroDashboardPage extends StatefulWidget {
   final int? userId;
@@ -49,34 +50,13 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
       appBar: AppBar(
         title: const Text(
           "Módulo de Caja",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            letterSpacing: 1.2,
-          ),
+          style: AppTheme.appBarTitleStyle,
         ),
         centerTitle: true,
         elevation: 8,
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(20),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 8,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
+          decoration: AppTheme.appBarDecoration,
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [

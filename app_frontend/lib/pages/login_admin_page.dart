@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../api_service.dart';
+import '../theme/app_theme.dart';
 
 class LoginAdminPage extends StatefulWidget {
   const LoginAdminPage({super.key});
@@ -93,34 +94,13 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
       appBar: AppBar(
         title: const Text(
           "Login para Administradores",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            letterSpacing: 1.2,
-          ),
+          style: AppTheme.appBarTitleStyle,
         ),
         centerTitle: true,
         elevation: 8,
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(20),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 8,
-                offset: Offset(0, 4),
-              )
-            ],
-          ),
+          decoration: AppTheme.appBarDecoration,
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -131,7 +111,7 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.deepPurple[50]!,
+              AppTheme.backgroundColor,
               Colors.white,
             ],
           ),
@@ -155,13 +135,13 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.deepPurple.withOpacity(0.1),
+                            color: AppTheme.primaryColor.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.admin_panel_settings,
                             size: 80,
-                            color: Colors.deepPurple,
+                            color: AppTheme.primaryColor,
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -170,7 +150,7 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.deepPurple,
+                            color: AppTheme.primaryColor,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -186,17 +166,17 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
                           controller: _usernameController,
                           decoration: InputDecoration(
                             labelText: "Usuario",
-                            prefixIcon: const Icon(Icons.person, color: Colors.deepPurple),
+                            prefixIcon: const Icon(Icons.person, color: AppTheme.primaryColor),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.deepPurple.withOpacity(0.3)),
+                              borderSide: BorderSide(color: AppTheme.primaryColor.withOpacity(0.3)),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.deepPurple, width: 2),
+                              borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
                             ),
                             filled: true,
                             fillColor: Colors.grey[50],
@@ -209,17 +189,17 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
                           controller: _passwordController,
                           decoration: InputDecoration(
                             labelText: "Contraseña",
-                            prefixIcon: const Icon(Icons.lock, color: Colors.deepPurple),
+                            prefixIcon: const Icon(Icons.lock, color: AppTheme.primaryColor),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.deepPurple.withOpacity(0.3)),
+                              borderSide: BorderSide(color: AppTheme.primaryColor.withOpacity(0.3)),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.deepPurple, width: 2),
+                              borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
                             ),
                             filled: true,
                             fillColor: Colors.grey[50],
@@ -258,7 +238,7 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
                               ? const Center(child: CircularProgressIndicator())
                               : ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepPurple,
+                              backgroundColor: AppTheme.primaryColor,
                               foregroundColor: Colors.white,
                               elevation: 3,
                               shape: RoundedRectangleBorder(

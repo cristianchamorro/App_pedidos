@@ -3,6 +3,7 @@ import '../api_service.dart';
 import 'detalle_pedido_page.dart';
 import 'pago_page.dart'; // ⬅️ Importamos la pantalla de pago
 import 'cajero_dashboard_page.dart'; // ⬅️ Importamos el dashboard de cajero
+import '../theme/app_theme.dart';
 
 class PedidosCajeroPage extends StatefulWidget {
   const PedidosCajeroPage({Key? key}) : super(key: key);
@@ -38,34 +39,13 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
       appBar: AppBar(
         title: const Text(
           "Pedidos Pendientes por pagar",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            letterSpacing: 1.2,
-          ),
+          style: AppTheme.appBarTitleStyle,
         ),
         centerTitle: true,
         elevation: 8,
         backgroundColor: Colors.transparent, // necesario para ver el gradient
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(20),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 8,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
+          decoration: AppTheme.appBarDecoration,
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
