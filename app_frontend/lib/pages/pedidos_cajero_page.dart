@@ -3,6 +3,7 @@ import '../api_service.dart';
 import 'detalle_pedido_page.dart';
 import 'pago_page.dart'; // ⬅️ Importamos la pantalla de pago
 import 'cajero_dashboard_page.dart'; // ⬅️ Importamos el dashboard de cajero
+import '../theme/app_theme.dart';
 
 class PedidosCajeroPage extends StatefulWidget {
   const PedidosCajeroPage({Key? key}) : super(key: key);
@@ -49,13 +50,9 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
         elevation: 8,
         backgroundColor: Colors.transparent, // necesario para ver el gradient
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.vertical(
+          decoration: BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+            borderRadius: const BorderRadius.vertical(
               bottom: Radius.circular(20),
             ),
             boxShadow: [
@@ -179,12 +176,12 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Colors.deepPurple.withOpacity(0.1),
+                                      color: AppTheme.primary.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: const Icon(
                                       Icons.receipt_long,
-                                      color: Colors.deepPurple,
+                                      color: AppTheme.primary,
                                       size: 24,
                                     ),
                                   ),
@@ -197,7 +194,7 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.deepPurple,
+                                          color: AppTheme.primary,
                                         ),
                                       ),
                                       const SizedBox(height: 2),
@@ -254,7 +251,7 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                           // Customer information
                           Row(
                             children: [
-                              const Icon(Icons.person, size: 18, color: Colors.deepPurple),
+                              const Icon(Icons.person, size: 18, color: AppTheme.primary),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -271,7 +268,7 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                           
                           Row(
                             children: [
-                              const Icon(Icons.phone, size: 18, color: Colors.deepPurple),
+                              const Icon(Icons.phone, size: 18, color: AppTheme.primary),
                               const SizedBox(width: 8),
                               Text(
                                 pedido['cliente_telefono'] ?? 'Sin teléfono',
@@ -287,7 +284,7 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(Icons.location_on, size: 18, color: Colors.deepPurple),
+                              const Icon(Icons.location_on, size: 18, color: AppTheme.primary),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -330,8 +327,8 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
                                   icon: const Icon(Icons.visibility, size: 18),
                                   label: const Text("Ver Detalle"),
                                   style: OutlinedButton.styleFrom(
-                                    foregroundColor: Colors.deepPurple,
-                                    side: const BorderSide(color: Colors.deepPurple),
+                                    foregroundColor: AppTheme.primary,
+                                    side: const BorderSide(color: AppTheme.primary),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),

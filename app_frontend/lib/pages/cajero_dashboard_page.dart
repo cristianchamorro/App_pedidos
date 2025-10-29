@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../api_service.dart';
 import 'package:intl/intl.dart';
+import '../theme/app_theme.dart';
 
 class CajeroDashboardPage extends StatefulWidget {
   final int? userId;
@@ -60,13 +61,9 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
         elevation: 8,
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.vertical(
+          decoration: BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+            borderRadius: const BorderRadius.vertical(
               bottom: Radius.circular(20),
             ),
             boxShadow: [
@@ -155,7 +152,7 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
               "Mes",
               "\$${_formatNumber(mes['total_mes'])}",
               "${mes['pedidos_mes']} pedidos",
-              Colors.purple,
+              AppTheme.accent,
               Icons.calendar_month,
             ),
             _buildStatCard(
@@ -253,7 +250,7 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
     return ElevatedButton.icon(
       onPressed: () => setState(() => _selectedTabIndex = index),
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected ? Colors.deepPurple : Colors.grey[300],
+        backgroundColor: isSelected ? AppTheme.primary : Colors.grey[300],
         foregroundColor: isSelected ? Colors.white : Colors.black87,
         padding: const EdgeInsets.symmetric(vertical: 12),
         shape: RoundedRectangleBorder(
@@ -362,7 +359,7 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
             ElevatedButton.icon(
               onPressed: () => _mostrarHistorialCompleto(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: AppTheme.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
               ),
@@ -445,7 +442,7 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
       case 'listo':
         return const Icon(Icons.check_circle, color: Colors.teal, size: 18);
       case 'entregado':
-        return const Icon(Icons.delivery_dining, color: Colors.purple, size: 18);
+        return const Icon(Icons.delivery_dining, color: AppTheme.accent, size: 18);
       case 'cancelado':
         return const Icon(Icons.cancel, color: Colors.red, size: 18);
       default:
@@ -490,7 +487,7 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.deepPurple,
+                    color: AppTheme.primary,
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                   ),
                   child: Row(
@@ -574,8 +571,8 @@ class _CajeroDashboardPageState extends State<CajeroDashboardPage> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.deepPurple,
+            colorScheme: ColorScheme.light(
+              primary: AppTheme.primary,
             ),
           ),
           child: child!,

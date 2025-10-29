@@ -7,6 +7,7 @@ import 'package:app_pedidos/pages/login_admin_page.dart';
 import 'pages/pedidos_cocinero_page.dart';
 import 'package:app_pedidos/pages/pedidos_cajero_page.dart';
 import 'package:app_pedidos/pages/domiciliario_page.dart';
+import 'package:app_pedidos/theme/app_theme.dart';
 import 'package:app_pedidos/pages/pedidos_listos_page.dart';
 
 void main() {
@@ -21,9 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'App Pedidos',
-      theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-      ),
+      theme: AppTheme.lightTheme,
       home: const LoginChoicePage(), // ✅ pantalla inicial unificada
       routes: {
         '/location': (context) {
