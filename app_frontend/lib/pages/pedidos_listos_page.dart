@@ -121,26 +121,30 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
       // Load products and use their images as media URLs
       final data = await api.fetchProducts();
       if (mounted) {
-        // Extract image URLs from products and shuffle
-        final urls = data
+        // Filter products with images
+        final productsWithImages = data
             .where((p) => p.imageUrl != null && p.imageUrl!.isNotEmpty)
-            .map((p) => p.imageUrl!)
             .toList();
-        urls.shuffle(Random());
+        
+        // Shuffle the products themselves (not just URLs)
+        productsWithImages.shuffle(Random());
         
         // If no product images, use placeholder URLs
-        if (urls.isEmpty) {
-          urls.addAll([
-            'https://via.placeholder.com/800x600?text=Producto+1',
-            'https://via.placeholder.com/800x600?text=Producto+2',
-            'https://via.placeholder.com/800x600?text=Producto+3',
-          ]);
+        if (productsWithImages.isEmpty) {
+          setState(() {
+            mediaUrls = [
+              'https://via.placeholder.com/800x600?text=Producto+1',
+              'https://via.placeholder.com/800x600?text=Producto+2',
+              'https://via.placeholder.com/800x600?text=Producto+3',
+            ];
+            productos = [];
+          });
+        } else {
+          setState(() {
+            productos = productsWithImages;
+            mediaUrls = productsWithImages.map((p) => p.imageUrl!).toList();
+          });
         }
-        
-        setState(() {
-          mediaUrls = urls;
-          productos = data;
-        });
       }
     } catch (e) {
       print('Error al cargar media URLs: $e');
@@ -151,6 +155,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
             'https://via.placeholder.com/800x600?text=Bienvenido',
             'https://via.placeholder.com/800x600?text=Productos',
           ];
+          productos = [];
         });
       }
     }
@@ -265,6 +270,19 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
                 Expanded(
                   flex: 1,
                   child: _buildPedidosCarousel(),
+                ),
+                
+                // Visual separator between sections
+                Container(
+                  height: 8,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.green.shade300,
+                        Colors.purple.shade300,
+                      ],
+                    ),
+                  ),
                 ),
                 
                 // Media Carousel (bottom half)
@@ -419,39 +437,20 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
                 ),
               ],
             ),
-            child: Column(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.person, size: 48, color: Colors.blue),
-                    const SizedBox(width: 20),
-                    Flexible(
-                      child: Text(
-                        "${pedido["cliente_nombre"] ?? 'Cliente'}",
-                        style: const TextStyle(
-                          fontSize: 42,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                const Icon(Icons.person, size: 48, color: Colors.blue),
+                const SizedBox(width: 20),
+                Flexible(
+                  child: Text(
+                    "${pedido["cliente_nombre"] ?? 'Cliente'}",
+                    style: const TextStyle(
+                      fontSize: 42,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ],
-                ),
-                const SizedBox(height: 25),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.phone, size: 48, color: Colors.blue),
-                    const SizedBox(width: 20),
-                    Text(
-                      "${pedido["cliente_telefono"] ?? '-'}",
-                      style: const TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ],
             ),
@@ -690,36 +689,29 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
               left: 40,
               right: 40,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 30),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.black.withOpacity(0.8),
-                      Colors.black.withOpacity(0.7),
+                      Colors.white.withOpacity(0.95),
+                      Colors.white.withOpacity(0.90),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(25),
+                  borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.4),
-                      blurRadius: 20,
-                      offset: const Offset(0, 5),
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 15,
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
                 child: Text(
                   producto.name,
-                  style: const TextStyle(
-                    fontSize: 48,
+                  style: TextStyle(
+                    fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black54,
-                        offset: Offset(2, 2),
-                        blurRadius: 4,
-                      ),
-                    ],
+                    color: Colors.grey.shade800,
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 2,
