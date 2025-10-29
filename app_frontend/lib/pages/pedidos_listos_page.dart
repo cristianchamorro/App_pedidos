@@ -359,8 +359,6 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
   }
 
   Widget _buildPedidoCard(Map<String, dynamic> pedido) {
-    final productos = (pedido["productos"] as List?) ?? [];
-    
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(50),
@@ -455,87 +453,6 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
               ],
             ),
           ),
-          
-          const SizedBox(height: 40),
-          
-          // Products - Larger fonts for TV
-          if (productos.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.all(35),
-              decoration: BoxDecoration(
-                color: Colors.orange.shade50,
-                borderRadius: BorderRadius.circular(25),
-                border: Border.all(color: Colors.orange.shade300, width: 4),
-              ),
-              child: Column(
-                children: [
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.restaurant_menu, size: 48, color: Colors.orange),
-                      SizedBox(width: 20),
-                      Text(
-                        'Productos:',
-                        style: TextStyle(
-                          fontSize: 38,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 25),
-                  ...productos.take(3).map((prod) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(18),
-                            decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Text(
-                              "${prod["cantidad"]}x",
-                              style: const TextStyle(
-                                fontSize: 36,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 25),
-                          Flexible(
-                            child: Text(
-                              "${prod["nombre"]}",
-                              style: const TextStyle(
-                                fontSize: 34,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                  if (productos.length > 3)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 15),
-                      child: Text(
-                        '+ ${productos.length - 3} más...',
-                        style: TextStyle(
-                          fontSize: 28,
-                          color: Colors.grey.shade600,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
           
           const Spacer(),
           
@@ -693,16 +610,16 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.white.withOpacity(0.95),
-                      Colors.white.withOpacity(0.90),
+                      Colors.white.withOpacity(0.3),
+                      Colors.white.withOpacity(0.25),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 15,
-                      offset: const Offset(0, 3),
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
