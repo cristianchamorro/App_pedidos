@@ -2,12 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'package:app_pedidos/models/product.dart';
-import '../theme/app_theme.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
-import '../theme/app_theme.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../theme/app_theme.dart';
 
 class ConfirmarPedidoPage extends StatefulWidget {
   final List<Product> carrito;

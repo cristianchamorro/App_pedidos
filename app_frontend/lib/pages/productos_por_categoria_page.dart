@@ -2,15 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'package:app_pedidos/models/product.dart';
-import '../theme/app_theme.dart';
 import 'package:app_pedidos/pages/agregar_producto_page.dart';
-import '../theme/app_theme.dart';
 import 'package:app_pedidos/pages/confirmar_pedido_page.dart';
-import '../theme/app_theme.dart';
 import 'package:app_pedidos/pages/pedidos_cajero_page.dart';   //
 import 'package:app_pedidos/pages/pedidos_cocinero_page.dart'; //
 import 'package:geolocator/geolocator.dart';
-import '../theme/app_theme.dart';
 
 class ProductosPorCategoriaPage extends StatefulWidget {
   final List<Product> productos;

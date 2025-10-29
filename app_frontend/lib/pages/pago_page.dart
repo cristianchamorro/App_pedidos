@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../api_service.dart';
-import '../theme/app_theme.dart';
 
 class PagoPage extends StatefulWidget {
   final int pedidoId;

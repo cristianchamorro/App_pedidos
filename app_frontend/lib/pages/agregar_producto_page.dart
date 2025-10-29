@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../models/categoria.dart';
-import '../theme/app_theme.dart';
 import '../models/vendor.dart';
-import '../theme/app_theme.dart';
 import '../models/product.dart';
-import '../theme/app_theme.dart';
 import '../api_service.dart';
-import '../theme/app_theme.dart';
 
 class AgregarProductoPage extends StatefulWidget {
   const AgregarProductoPage({Key? key}) : super(key: key);
