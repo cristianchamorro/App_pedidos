@@ -480,7 +480,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [AppTheme.primary.shade400, AppTheme.primary.shade600],
+                          colors: [AppTheme.primary, AppTheme.primaryDark],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),

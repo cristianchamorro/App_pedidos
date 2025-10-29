@@ -113,7 +113,7 @@ class AppTheme {
       ),
       
       // Outlined Button Theme
-      outlinedButtonThemeData: OutlinedButtonThemeData(
+      outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: primary,
           side: const BorderSide(color: primary, width: 2),
