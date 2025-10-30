@@ -6,6 +6,8 @@ import 'package:app_pedidos/pages/agregar_producto_page.dart';
 import 'package:app_pedidos/pages/confirmar_pedido_page.dart';
 import 'package:app_pedidos/pages/pedidos_cajero_page.dart';   //
 import 'package:app_pedidos/pages/pedidos_cocinero_page.dart'; //
+import 'package:app_pedidos/pages/domiciliario_page.dart';
+import 'package:app_pedidos/pages/pedidos_listos_page.dart';
 import 'package:geolocator/geolocator.dart';
 
 class ProductosPorCategoriaPage extends StatefulWidget {
@@ -111,57 +113,161 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
   }
 
   void mostrarDetalleProducto(Product producto) {
+    int cantidadDialog = cantidadesSeleccionadas[producto.id] ?? 1;
+    
     showDialog(
       context: context,
       builder: (context) {
         final maxDialogImgHeight = MediaQuery.of(context).size.height * 0.4;
-        return AlertDialog(
-          title: Text(producto.name),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (producto.imageUrl != null && producto.imageUrl!.isNotEmpty)
-                  ConstrainedBox(
-                    constraints: BoxConstraints(maxHeight: maxDialogImgHeight),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        producto.imageUrl!,
-                        fit: BoxFit.contain, // que no se desborde dentro del diálogo
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            alignment: Alignment.center,
-                            height: maxDialogImgHeight,
-                            child: const CircularProgressIndicator(),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: Colors.grey.shade200,
-                          alignment: Alignment.center,
-                          height: maxDialogImgHeight,
-                          child: const Icon(Icons.broken_image, size: 64),
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text(producto.name),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (producto.imageUrl != null && producto.imageUrl!.isNotEmpty)
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxHeight: maxDialogImgHeight),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            producto.imageUrl!,
+                            fit: BoxFit.contain,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                alignment: Alignment.center,
+                                height: maxDialogImgHeight,
+                                child: const CircularProgressIndicator(),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              color: Colors.grey.shade200,
+                              alignment: Alignment.center,
+                              height: maxDialogImgHeight,
+                              child: const Icon(Icons.broken_image, size: 64),
+                            ),
+                          ),
                         ),
+                      )
+                    else
+                      const Icon(Icons.image_not_supported, size: 80),
+                    const SizedBox(height: 12),
+                    Text(
+                      producto.description ?? "Sin descripción",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      "\$${producto.price.toStringAsFixed(2)}",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
                       ),
                     ),
-                  )
-                else
-                  const Icon(Icons.image_not_supported, size: 80),
-                const SizedBox(height: 12),
-                Text(
-                  producto.description ?? "Sin descripción",
-                  textAlign: TextAlign.center,
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove_circle, color: AppTheme.primary),
+                          onPressed: () {
+                            if (cantidadDialog > 1) {
+                              setDialogState(() {
+                                cantidadDialog--;
+                              });
+                            }
+                          },
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '$cantidadDialog',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add_circle, color: AppTheme.primary),
+                          onPressed: () {
+                            setDialogState(() {
+                              cantidadDialog++;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Cerrar"),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      cantidadesSeleccionadas[producto.id] = cantidadDialog;
+                    });
+                    
+                    final indexExistente = carrito.indexWhere((p) => p.id == producto.id);
+                    
+                    if (indexExistente >= 0) {
+                      setState(() {
+                        carrito[indexExistente].cantidad = cantidadDialog;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${producto.name} actualizado (x$cantidadDialog)'),
+                          duration: const Duration(seconds: 1),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    } else {
+                      setState(() {
+                        producto.cantidad = cantidadDialog;
+                        carrito.add(producto);
+                      });
+                      if (widget.onAgregarAlPedido != null) {
+                        widget.onAgregarAlPedido!(producto);
+                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              const Icon(Icons.check_circle, color: Colors.white),
+                              const SizedBox(width: 8),
+                              Text('${producto.name} agregado (x$cantidadDialog)'),
+                            ],
+                          ),
+                          duration: const Duration(seconds: 1),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.add_shopping_cart),
+                  label: const Text("Agregar al Carrito"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primary,
+                    foregroundColor: Colors.white,
+                  ),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cerrar"),
-            ),
-          ],
+            );
+          },
         );
       },
     );
@@ -301,6 +407,30 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                 );
               },
             ),
+            IconButton(
+              icon: const Icon(Icons.delivery_dining),
+              tooltip: "Ir a Domiciliario",
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DomiciliarioPage(),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.check_circle),
+              tooltip: "Pedidos Listos",
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PedidosListosPage(),
+                  ),
+                );
+              },
+            ),
           ],
         ],
       ),
@@ -349,82 +479,66 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
             ),
           ),
 
-          // Horizontal category filter
+          // Modern category cards
           if (productosPorCategoria.isNotEmpty)
             Container(
-              height: 60,
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.1),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
-              child: ListView(
+              child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                children: [
-                  // "Todas" button
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: FilterChip(
-                      label: Text(
-                        'Todas (${widget.productos.length})',
-                        style: TextStyle(
-                          color: categoriaSeleccionada == null
-                              ? Colors.white
-                              : AppTheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      selected: categoriaSeleccionada == null,
-                      onSelected: (selected) {
+                child: Row(
+                  children: [
+                    // "Todas" category card
+                    _buildCategoryCard(
+                      context: context,
+                      categoryName: 'Todas',
+                      count: widget.productos.length,
+                      isSelected: categoriaSeleccionada == null,
+                      imageUrl: widget.productos.isNotEmpty && widget.productos.first.imageUrl != null
+                          ? widget.productos.first.imageUrl!
+                          : null,
+                      onTap: () {
                         setState(() {
                           categoriaSeleccionada = null;
                         });
                       },
-                      selectedColor: AppTheme.primary,
-                      backgroundColor: Colors.grey.shade200,
-                      checkmarkColor: Colors.white,
-                      elevation: 2,
-                      shadowColor: AppTheme.primary.withOpacity(0.3),
                     ),
-                  ),
-                  // Category chips
-                  ...productosPorCategoria.entries.map((entry) {
-                    final categoria = entry.key;
-                    final count = entry.value.length;
-                    final isSelected = categoriaSeleccionada == categoria;
+                    // Category cards from products
+                    ...productosPorCategoria.entries.map((entry) {
+                      final categoria = entry.key;
+                      final productos = entry.value;
+                      final count = productos.length;
+                      final isSelected = categoriaSeleccionada == categoria;
+                      // Get first product image from this category
+                      final imageUrl = productos.firstWhere(
+                        (p) => p.imageUrl != null && p.imageUrl!.isNotEmpty,
+                        orElse: () => productos.first,
+                      ).imageUrl;
 
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: FilterChip(
-                        label: Text(
-                          '$categoria ($count)',
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : AppTheme.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        selected: isSelected,
-                        onSelected: (selected) {
+                      return _buildCategoryCard(
+                        context: context,
+                        categoryName: categoria,
+                        count: count,
+                        isSelected: isSelected,
+                        imageUrl: imageUrl,
+                        onTap: () {
                           setState(() {
-                            categoriaSeleccionada = selected ? categoria : null;
+                            categoriaSeleccionada = categoria;
                           });
                         },
-                        selectedColor: AppTheme.primary,
-                        backgroundColor: Colors.grey.shade200,
-                        checkmarkColor: Colors.white,
-                        elevation: 2,
-                        shadowColor: AppTheme.primary.withOpacity(0.3),
-                      ),
-                    );
-                  }).toList(),
-                ],
+                      );
+                    }).toList(),
+                  ],
+                ),
               ),
             ),
 
@@ -752,35 +866,16 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                                           mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Column(
-                                              children: [
-                                                Text(
-                                                  producto.name,
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 15,
-                                                    color: AppTheme.primary,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                  maxLines: 2,
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                                if (producto.description != null && 
-                                                    producto.description!.isNotEmpty)
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(top: 4),
-                                                    child: Text(
-                                                      producto.description!,
-                                                      style: TextStyle(
-                                                        fontSize: 11,
-                                                        color: Colors.grey.shade600,
-                                                      ),
-                                                      textAlign: TextAlign.center,
-                                                      maxLines: 1,
-                                                      overflow: TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                              ],
+                                            Text(
+                                              producto.name,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                                color: AppTheme.primary,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                             Column(
                                               children: [
@@ -937,6 +1032,160 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: AppTheme.primary,
+      ),
+    );
+  }
+
+  Widget _buildCategoryCard({
+    required BuildContext context,
+    required String categoryName,
+    required int count,
+    required bool isSelected,
+    String? imageUrl,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 140,
+        margin: const EdgeInsets.symmetric(horizontal: 6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: isSelected
+                  ? AppTheme.primary.withOpacity(0.4)
+                  : Colors.grey.withOpacity(0.2),
+              blurRadius: isSelected ? 12 : 6,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Background image with overlay
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                height: 140,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: isSelected
+                        ? [AppTheme.primary.withOpacity(0.8), AppTheme.primaryDark]
+                        : [Colors.grey.shade300, Colors.grey.shade400],
+                  ),
+                ),
+                child: imageUrl != null && imageUrl.isNotEmpty
+                    ? Stack(
+                        children: [
+                          Image.network(
+                            imageUrl,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              color: Colors.grey.shade300,
+                              child: const Icon(Icons.category, size: 40, color: Colors.white),
+                            ),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: isSelected
+                                    ? [
+                                        AppTheme.primary.withOpacity(0.6),
+                                        AppTheme.primaryDark.withOpacity(0.8),
+                                      ]
+                                    : [
+                                        Colors.black.withOpacity(0.3),
+                                        Colors.black.withOpacity(0.6),
+                                      ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : const Center(
+                        child: Icon(Icons.category, size: 50, color: Colors.white),
+                      ),
+              ),
+            ),
+            // Text overlay
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.7),
+                    ],
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      categoryName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: isSelected ? Colors.white : Colors.white.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '$count',
+                        style: TextStyle(
+                          color: isSelected ? AppTheme.primary : Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Selected indicator
+            if (isSelected)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check,
+                    color: AppTheme.primary,
+                    size: 20,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
