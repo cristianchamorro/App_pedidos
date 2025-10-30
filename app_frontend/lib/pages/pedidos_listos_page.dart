@@ -125,7 +125,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
         }
 
         setState(() {
-          _previousPedidosCount = pedidos.length;
+          _previousPedidosCount = filteredData.length;
           pedidos = filteredData;
           _seenOrderIds = currentOrderIds;
           isLoading = false;
@@ -594,14 +594,14 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
                             (mediaUrls.length / crossAxisCount).ceil(),
                             (i) => Container(
                               margin: const EdgeInsets.symmetric(horizontal: 8),
-                              width: _currentMediaIndex == i ? 50 : 15,
+                              width: pageIndex == i ? 50 : 15,
                               height: 15,
                               decoration: BoxDecoration(
-                                color: _currentMediaIndex == i
+                                color: pageIndex == i
                                     ? Colors.white
                                     : Colors.white.withOpacity(0.4),
                                 borderRadius: BorderRadius.circular(8),
-                                boxShadow: _currentMediaIndex == i
+                                boxShadow: pageIndex == i
                                     ? [
                                         BoxShadow(
                                           color: Colors.black.withOpacity(0.3),
