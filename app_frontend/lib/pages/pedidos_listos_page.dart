@@ -27,6 +27,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
   int _currentPedidoIndex = 0;
   int _currentMediaIndex = 0;
   int _previousPedidosCount = 0;
+  int _totalMediaPages = 1; // Track total number of pages in media carousel
   Set<int> _seenOrderIds = {}; // Track orders we've already seen
   final PageController _pedidosPageController = PageController();
   final PageController _mediaPageController = PageController();
@@ -55,8 +56,9 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
 
     // Auto-advance media carousel every 5 seconds
     _mediaCarouselTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (mediaUrls.isNotEmpty && _mediaPageController.hasClients) {
-        final nextPage = (_currentMediaIndex + 1) % mediaUrls.length;
+      if (mediaUrls.isNotEmpty && _mediaPageController.hasClients && _totalMediaPages > 0) {
+        // Loop back to first page when reaching the end
+        final nextPage = (_currentMediaIndex + 1) % _totalMediaPages;
         _mediaPageController.animateToPage(
           nextPage,
           duration: const Duration(milliseconds: 600),
@@ -561,6 +563,18 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
             crossAxisCount = 2; // Tablet
           }
 
+          // Calculate and store total pages for proper looping
+          final totalPages = (mediaUrls.length / crossAxisCount).ceil();
+          if (_totalMediaPages != totalPages) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  _totalMediaPages = totalPages;
+                });
+              }
+            });
+          }
+
           return PageView.builder(
             controller: _mediaPageController,
             onPageChanged: (index) {
@@ -568,7 +582,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
                 _currentMediaIndex = index;
               });
             },
-            itemCount: (mediaUrls.length / crossAxisCount).ceil(),
+            itemCount: totalPages,
             itemBuilder: (context, pageIndex) {
               final startIndex = pageIndex * crossAxisCount;
               final endIndex = (startIndex + crossAxisCount).clamp(0, mediaUrls.length);
