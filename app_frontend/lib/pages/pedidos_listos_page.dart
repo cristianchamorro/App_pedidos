@@ -290,7 +290,10 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
         backgroundColor: Colors.green,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            // Navigate back to login choice page
+            Navigator.of(context).pushReplacementNamed('/');
+          },
         ),
         title: const Text(
           'Pedidos Listos',
@@ -306,9 +309,9 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
       )
           : Column(
         children: [
-          // Orders Carousel (35% of screen)
+          // Orders Carousel (40% of screen)
           Expanded(
-            flex: 35,
+            flex: 40,
             child: _buildPedidosCarousel(),
           ),
 
@@ -325,9 +328,9 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
             ),
           ),
 
-          // Media Carousel (65% of screen)
+          // Media Carousel (60% of screen)
           Expanded(
-            flex: 65,
+            flex: 60,
             child: _buildMediaCarousel(),
           ),
         ],
