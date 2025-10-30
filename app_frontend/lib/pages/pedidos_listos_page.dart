@@ -402,149 +402,133 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
   }
 
   Widget _buildPedidoCard(Map<String, dynamic> pedido) {
-    // Use LayoutBuilder + SingleChildScrollView + ConstrainedBox + IntrinsicHeight
-    // so the Column can fill the available height (preserving Spacer) but
-    // becomes scrollable when content does not fit.
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(50),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Colors.green.shade100, Colors.white],
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(30),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Colors.green.shade100, Colors.white],
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Header with status badge - Optimized for visibility without scroll
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.green.shade600, Colors.green.shade400],
+              ),
+              borderRadius: BorderRadius.circular(25),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.green.withOpacity(0.5),
+                  blurRadius: 20,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white, size: 45),
+                const SizedBox(width: 15),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'PEDIDO LISTO',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                    Text(
+                      'Pedido #${pedido["order_id"]}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 38,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          child: SingleChildScrollView(
-            // Allow vertical scrolling if card content is taller than available space.
-            physics: const ClampingScrollPhysics(),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: IntrinsicHeight(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Header with status badge - Larger for TV
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 25),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Colors.green.shade600, Colors.green.shade400],
-                        ),
-                        borderRadius: BorderRadius.circular(40),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.green.withOpacity(0.5),
-                            blurRadius: 25,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.check_circle, color: Colors.white, size: 60),
-                          const SizedBox(width: 25),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'PEDIDO LISTO',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 3,
-                                ),
-                              ),
-                              Text(
-                                'Pedido #${pedido["order_id"]}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 48,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+
+          const SizedBox(height: 25),
+
+          // Customer info - Optimized for visibility without scroll
+          Container(
+            padding: const EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.person, size: 40, color: Colors.blue),
+                const SizedBox(width: 15),
+                Flexible(
+                  child: Text(
+                    "${pedido["cliente_nombre"] ?? 'Cliente'}",
+                    style: const TextStyle(
+                      fontSize: 34,
+                      fontWeight: FontWeight.bold,
                     ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
 
-                    const SizedBox(height: 50),
+          const Spacer(),
 
-                    // Customer info - Larger for TV visibility
-                    Container(
-                      padding: const EdgeInsets.all(40),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(25),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
-                            blurRadius: 15,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
+          // Page indicator - Optimized size
+          if (pedidos.length > 1)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                pedidos.length,
+                    (index) => Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 6),
+                  width: _currentPedidoIndex == index ? 40 : 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: _currentPedidoIndex == index
+                        ? Colors.green
+                        : Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(6),
+                    boxShadow: _currentPedidoIndex == index
+                        ? [
+                      BoxShadow(
+                        color: Colors.green.withOpacity(0.5),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.person, size: 48, color: Colors.blue),
-                          const SizedBox(width: 20),
-                          Flexible(
-                            child: Text(
-                              "${pedido["cliente_nombre"] ?? 'Cliente'}",
-                              style: const TextStyle(
-                                fontSize: 42,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const Spacer(),
-
-                    // Page indicator - Larger for TV
-                    if (pedidos.length > 1)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          pedidos.length,
-                              (index) => Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 8),
-                            width: _currentPedidoIndex == index ? 50 : 15,
-                            height: 15,
-                            decoration: BoxDecoration(
-                              color: _currentPedidoIndex == index
-                                  ? Colors.green
-                                  : Colors.grey.shade300,
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: _currentPedidoIndex == index
-                                  ? [
-                                BoxShadow(
-                                  color: Colors.green.withOpacity(0.5),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ]
-                                  : null,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
+                    ]
+                        : null,
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      },
+        ],
+      ),
     );
   }
 
