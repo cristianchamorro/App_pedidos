@@ -112,6 +112,20 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
     return carrito.fold(0, (sum, product) => sum + product.cantidad);
   }
 
+  String? _getCategoryImageUrl(List<Product> productos) {
+    if (productos.isEmpty) return null;
+    
+    // Try to find a product with a valid image
+    for (var producto in productos) {
+      if (producto.imageUrl != null && producto.imageUrl!.isNotEmpty) {
+        return producto.imageUrl;
+      }
+    }
+    
+    // No product with valid image found
+    return null;
+  }
+
   void mostrarDetalleProducto(Product producto) {
     int cantidadDialog = cantidadesSeleccionadas[producto.id] ?? 1;
     
@@ -503,11 +517,7 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                       categoryName: 'Todas',
                       count: widget.productos.length,
                       isSelected: categoriaSeleccionada == null,
-                      imageUrl: widget.productos.isNotEmpty && 
-                               widget.productos.first.imageUrl != null &&
-                               widget.productos.first.imageUrl!.isNotEmpty
-                          ? widget.productos.first.imageUrl!
-                          : null,
+                      imageUrl: _getCategoryImageUrl(widget.productos),
                       onTap: () {
                         setState(() {
                           categoriaSeleccionada = null;
@@ -521,18 +531,8 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                       final count = productos.length;
                       final isSelected = categoriaSeleccionada == categoria;
                       
-                      // Get first product image from this category, safely
-                      String? imageUrl;
-                      if (productos.isNotEmpty) {
-                        final productWithImage = productos.firstWhere(
-                          (p) => p.imageUrl != null && p.imageUrl!.isNotEmpty,
-                          orElse: () => productos.first,
-                        );
-                        if (productWithImage.imageUrl != null && 
-                            productWithImage.imageUrl!.isNotEmpty) {
-                          imageUrl = productWithImage.imageUrl;
-                        }
-                      }
+                      // Get representative image from this category
+                      String? imageUrl = _getCategoryImageUrl(productos);
 
                       return _buildCategoryCard(
                         context: context,
