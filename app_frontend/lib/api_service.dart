@@ -17,19 +17,32 @@ class ApiService {
     final envUrl = dotenv.env['BACKEND_URL'];
     
     if (envUrl != null && envUrl.isNotEmpty) {
-      // Use the URL from .env file if available
-      baseUrl = envUrl;
-    } else {
-      // Fallback to default URLs based on platform
-      if (kIsWeb) {
-        baseUrl = "http://localhost:3000";
-      } else if (Platform.isAndroid) {
-        baseUrl = "http://192.168.101.6:3000";
-      } else if (Platform.isIOS) {
-        baseUrl = "http://localhost:3000";
+      // Validate the URL format
+      final uri = Uri.tryParse(envUrl);
+      if (uri != null && uri.hasScheme && uri.hasAuthority) {
+        // Use the URL from .env file if valid
+        baseUrl = envUrl;
       } else {
-        baseUrl = "http://localhost:3000";
+        // Invalid URL format, use default
+        print('Warning: Invalid BACKEND_URL format in .env: $envUrl. Using default.');
+        baseUrl = _getDefaultUrl();
       }
+    } else {
+      // No URL in .env, use default
+      baseUrl = _getDefaultUrl();
+    }
+  }
+
+  // Helper method to get default URL based on platform
+  String _getDefaultUrl() {
+    if (kIsWeb) {
+      return "http://localhost:3000";
+    } else if (Platform.isAndroid) {
+      return "http://192.168.101.6:3000";
+    } else if (Platform.isIOS) {
+      return "http://localhost:3000";
+    } else {
+      return "http://localhost:3000";
     }
   }
 
