@@ -291,14 +291,26 @@ class _GestionMesasPageState extends State<GestionMesasPage> {
     );
   }
 
-  void _abrirMesa(Mesa mesa) {
-    // Aquí se abriría el POS para crear una orden para esta mesa
-    Navigator.push(
+  void _abrirMesa(Mesa mesa) async {
+    // Navegar al POS con información de la mesa
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => POSTerminalPage(userId: widget.userId),
+        builder: (context) => POSTerminalPage(
+          userId: widget.userId,
+          mesaId: mesa.id,
+          mesaNombre: mesa.nombre,
+        ),
       ),
     );
+    
+    // Si se creó un pedido exitosamente, actualizar estado de la mesa
+    if (result != null && result == true) {
+      setState(() {
+        // Mesa cambió a ocupada después de tomar pedido
+        mesa.estado = 'ocupada';
+      });
+    }
   }
 
   void _verOrden(Mesa mesa) {

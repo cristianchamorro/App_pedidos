@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 import '../models/product.dart';
 import '../api_service.dart';
 import '../theme/app_theme.dart';
@@ -7,8 +9,15 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class POSTerminalPage extends StatefulWidget {
   final int? userId;
+  final int? mesaId;  // ID de la mesa (opcional)
+  final String? mesaNombre;  // Nombre de la mesa (opcional)
 
-  const POSTerminalPage({Key? key, this.userId}) : super(key: key);
+  const POSTerminalPage({
+    Key? key,
+    this.userId,
+    this.mesaId,
+    this.mesaNombre,
+  }) : super(key: key);
 
   @override
   _POSTerminalPageState createState() => _POSTerminalPageState();
@@ -152,23 +161,112 @@ class _POSTerminalPageState extends State<POSTerminalPage> {
     );
   }
 
-  void _finalizarVenta() {
-    // Limpiar carrito y estado
-    setState(() {
-      _carrito.clear();
-      _montoPagado = 0.0;
-      _inputTeclado = '';
-      _mostrarTeclado = false;
-    });
+  Future<void> _finalizarVenta() async {
+    try {
+      // Crear lista de productos para el pedido
+      final List<Map<String, dynamic>> productosParaPedido = [];
+      
+      _carrito.forEach((productId, cantidad) {
+        final producto = _todosProductos.firstWhere((p) => p.id == productId);
+        productosParaPedido.add({
+          "id": producto.id,
+          "nombre": producto.name,
+          "cantidad": cantidad,
+          "price": producto.price,
+          "vendedor": producto.vendorName ?? 'N/A',
+          "driver": producto.driverName ?? 'N/A',
+        });
+      });
 
-    // Mostrar mensaje de éxito
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text("✓ Venta procesada exitosamente"),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+      // Crear payload para crear el pedido
+      final String nombrePedido = widget.mesaNombre != null 
+          ? widget.mesaNombre! 
+          : "Pedido POS";
+      final String direccion = widget.mesaNombre != null
+          ? "Para consumir en ${widget.mesaNombre}"
+          : "Pedido en local";
+      
+      final payload = {
+        "nombre": nombrePedido,
+        "telefono": "0000000000",  // Teléfono genérico para pedidos en local
+        "direccion_entrega": direccion,
+        "ubicacion": {
+          "lat": 0.0,  // Ubicación local por defecto
+          "lng": 0.0,
+        },
+        "productos": productosParaPedido,
+      };
+
+      // Crear el pedido (estado: pendiente)
+      final response = await http.post(
+        Uri.parse('${api.baseUrl}/pedidos'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode != 201) {
+        throw Exception("Error al crear pedido: ${response.statusCode}");
+      }
+
+      final data = jsonDecode(response.body);
+      if (data['success'] != true) {
+        throw Exception("Error en la respuesta del servidor");
+      }
+
+      // Obtener el ID del pedido creado
+      final int orderId = data['order_id'];
+      final double total = _calcularTotal();
+
+      // Confirmar pago inmediatamente (cambiar estado a 'pagado' y luego a 'preparando')
+      final pagoSuccess = await api.confirmarPago(
+        orderId,
+        total,
+        changedBy: widget.userId,
+      );
+
+      if (!pagoSuccess) {
+        throw Exception("Error al confirmar pago");
+      }
+
+      // Limpiar carrito y estado
+      setState(() {
+        _carrito.clear();
+        _montoPagado = 0.0;
+        _inputTeclado = '';
+        _mostrarTeclado = false;
+      });
+
+      // Mostrar mensaje de éxito
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("✓ Pedido #$orderId creado y enviado a cocina"),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+        
+        // Si es de una mesa, volver a la gestión de mesas
+        if (widget.mesaId != null) {
+          Future.delayed(const Duration(seconds: 2), () {
+            if (mounted) {
+              Navigator.pop(context, true); // Retornar true para indicar éxito
+            }
+          });
+        }
+      }
+    } catch (e) {
+      // Mostrar error
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error: $e"),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
   }
 
   void _onTeclaPresionada(String tecla) {
@@ -192,9 +290,9 @@ class _POSTerminalPageState extends State<POSTerminalPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Terminal POS",
-          style: TextStyle(
+        title: Text(
+          widget.mesaNombre != null ? "Pedido - ${widget.mesaNombre}" : "Terminal POS",
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 22,
