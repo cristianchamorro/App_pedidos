@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import 'models/categoria.dart';
@@ -12,14 +13,23 @@ class ApiService {
   late final String baseUrl;
 
   ApiService() {
-    if (kIsWeb) {
-      baseUrl = "http://localhost:3000";
-    } else if (Platform.isAndroid) {
-      baseUrl = "http://192.168.101.6:3000";
-    } else if (Platform.isIOS) {
-      baseUrl = "http://localhost:3000";
+    // Load backend URL from .env file
+    final envUrl = dotenv.env['BACKEND_URL'];
+    
+    if (envUrl != null && envUrl.isNotEmpty) {
+      // Use the URL from .env file if available
+      baseUrl = envUrl;
     } else {
-      baseUrl = "http://localhost:3000";
+      // Fallback to default URLs based on platform
+      if (kIsWeb) {
+        baseUrl = "http://localhost:3000";
+      } else if (Platform.isAndroid) {
+        baseUrl = "http://192.168.101.6:3000";
+      } else if (Platform.isIOS) {
+        baseUrl = "http://localhost:3000";
+      } else {
+        baseUrl = "http://localhost:3000";
+      }
     }
   }
 
