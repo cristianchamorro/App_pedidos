@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
@@ -22,9 +22,14 @@ class ApiService {
       if (uri != null && uri.hasScheme && uri.hasAuthority) {
         // Use the URL from .env file if valid
         baseUrl = envUrl;
+        if (kDebugMode) {
+          print('Backend URL loaded from .env: $baseUrl');
+        }
       } else {
         // Invalid URL format, use default
-        print('Warning: Invalid BACKEND_URL format in .env: $envUrl. Using default.');
+        if (kDebugMode) {
+          print('Warning: Invalid BACKEND_URL format in .env: $envUrl. Using default.');
+        }
         baseUrl = _getDefaultUrl();
       }
     } else {

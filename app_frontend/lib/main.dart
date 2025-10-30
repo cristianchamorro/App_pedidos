@@ -20,7 +20,7 @@ void main() async {
     await dotenv.load(fileName: ".env");
   } catch (e) {
     // If .env file doesn't exist or has issues, continue with default values
-    print('Warning: Could not load .env file. Using default backend configuration. Error: $e');
+    debugPrint('Warning: Could not load .env file. Using default backend configuration. Error: $e');
   }
   
   runApp(const MyApp());
