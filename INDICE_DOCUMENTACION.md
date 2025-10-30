@@ -10,6 +10,8 @@ Este documento sirve como punto de entrada a toda la documentación del sistema 
 
 ### 🆕 Documentos Creados para Esta Tarea
 
+#### Documentación del Sistema Original
+
 1. **[DOCUMENTACION_COMPLETA_SISTEMA.md](./DOCUMENTACION_COMPLETA_SISTEMA.md)** ⭐ **EMPIEZA AQUÍ**
    - 📊 Análisis completo del esquema de base de datos PostgreSQL
    - 🗄️ Descripción detallada de todas las tablas y sus relaciones
@@ -38,6 +40,24 @@ Este documento sirve como punto de entrada a toda la documentación del sistema 
    - 🧪 Flujo de prueba completo paso a paso
    - 💡 Tips y mejores prácticas
    - 🔍 Guía de debugging
+
+4. **[INDICE_DOCUMENTACION.md](./INDICE_DOCUMENTACION.md)** (Este documento)
+   - Índice completo de toda la documentación
+   - Rutas de aprendizaje recomendadas
+   - Búsqueda rápida por tema
+
+#### Documentación del Sistema POS (Nuevo)
+
+5. **[🏪 SISTEMA_POS_COMPLETO.md](./SISTEMA_POS_COMPLETO.md)** ⭐ **SISTEMA POS**
+   - 🖥️ Terminal POS profesional con múltiples métodos de pago
+   - 🍽️ Sistema de gestión de mesas para restaurantes
+   - 📊 Dashboard mejorado con gráficos interactivos (fl_chart)
+   - 🔄 Flujos de trabajo completos (3 diagramas)
+   - 🎯 Casos de uso por tipo de negocio
+   - 🚀 Roadmap de funcionalidades futuras
+   - 📱 Guías de usuario para cajeros y gerentes
+   - 🏗️ Arquitectura técnica del sistema POS
+   - 21KB de documentación detallada
 
 ---
 
