@@ -34,9 +34,6 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
   @override
   void initState() {
     super.initState();
-    // Set fullscreen mode
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-
     _cargarDatos();
 
     // Refresh orders every 5 seconds to detect new ready orders
@@ -83,8 +80,6 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
     _pedidosPageController.dispose();
     _mediaPageController.dispose();
     _audioPlayer.dispose();
-    // Restore system UI
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
@@ -291,6 +286,18 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.green,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text(
+          'Pedidos Listos',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+      ),
       body: isLoading
           ? const Center(
         child: CircularProgressIndicator(
@@ -299,9 +306,9 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
       )
           : Column(
         children: [
-          // Orders Carousel (top half)
+          // Orders Carousel (35% of screen)
           Expanded(
-            flex: 1,
+            flex: 35,
             child: _buildPedidosCarousel(),
           ),
 
@@ -318,9 +325,9 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
             ),
           ),
 
-          // Media Carousel (bottom half)
+          // Media Carousel (65% of screen)
           Expanded(
-            flex: 1,
+            flex: 65,
             child: _buildMediaCarousel(),
           ),
         ],
