@@ -520,19 +520,15 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                       final productos = entry.value;
                       final count = productos.length;
                       final isSelected = categoriaSeleccionada == categoria;
-                      // Get first product image from this category, safely
-                      String? imageUrl;
-                      try {
-                        final productWithImage = productos.firstWhere(
-                          (p) => p.imageUrl != null && p.imageUrl!.isNotEmpty,
-                          orElse: () => productos.first,
-                        );
-                        if (productWithImage.imageUrl != null && productWithImage.imageUrl!.isNotEmpty) {
-                          imageUrl = productWithImage.imageUrl;
-                        }
-                      } catch (e) {
-                        imageUrl = null;
-                      }
+                      // Get first product image from this category
+                      final productWithImage = productos.firstWhere(
+                        (p) => p.imageUrl != null && p.imageUrl!.isNotEmpty,
+                        orElse: () => productos.first,
+                      );
+                      final imageUrl = (productWithImage.imageUrl != null && 
+                                       productWithImage.imageUrl!.isNotEmpty)
+                          ? productWithImage.imageUrl
+                          : null;
 
                       return _buildCategoryCard(
                         context: context,
