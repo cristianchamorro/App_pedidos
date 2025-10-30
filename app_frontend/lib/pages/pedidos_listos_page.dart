@@ -35,7 +35,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
     super.initState();
     // Set fullscreen mode
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    
+
     _cargarDatos();
 
     // Refresh orders every 5 seconds to detect new ready orders
@@ -102,7 +102,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
         if (data.length > _previousPedidosCount && _previousPedidosCount > 0) {
           _mostrarAlertaNuevoPedido();
         }
-        
+
         setState(() {
           _previousPedidosCount = pedidos.length;
           pedidos = data;
@@ -125,10 +125,10 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
         final productsWithImages = data
             .where((p) => p.imageUrl != null && p.imageUrl!.isNotEmpty)
             .toList();
-        
+
         // Shuffle the products themselves (not just URLs)
         productsWithImages.shuffle(Random());
-        
+
         // If no product images, use placeholder URLs
         if (productsWithImages.isEmpty) {
           setState(() {
@@ -163,11 +163,11 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
 
   void _mostrarAlertaNuevoPedido() async {
     if (!mounted || _showingAlert) return;
-    
+
     setState(() {
       _showingAlert = true;
     });
-    
+
     // Play notification sound
     try {
       await _audioPlayer.play(AssetSource('sounds/notification.mp3'));
@@ -175,7 +175,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
       // Fallback to system sound if custom sound fails
       SystemSound.play(SystemSoundType.alert);
     }
-    
+
     // Show prominent visual alert overlay
     if (mounted) {
       showDialog(
@@ -243,7 +243,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
           ),
         ),
       );
-      
+
       // Auto-dismiss after 5 seconds
       await Future.delayed(const Duration(seconds: 5));
       if (mounted) {
@@ -260,38 +260,38 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
     return Scaffold(
       body: isLoading
           ? const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-              ),
-            )
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+        ),
+      )
           : Column(
-              children: [
-                // Orders Carousel (top half)
-                Expanded(
-                  flex: 1,
-                  child: _buildPedidosCarousel(),
-                ),
-                
-                // Visual separator between sections
-                Container(
-                  height: 8,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.green.shade300,
-                        Colors.purple.shade300,
-                      ],
-                    ),
-                  ),
-                ),
-                
-                // Media Carousel (bottom half)
-                Expanded(
-                  flex: 1,
-                  child: _buildMediaCarousel(),
-                ),
-              ],
+        children: [
+          // Orders Carousel (top half)
+          Expanded(
+            flex: 1,
+            child: _buildPedidosCarousel(),
+          ),
+
+          // Visual separator between sections
+          Container(
+            height: 8,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.green.shade300,
+                  Colors.purple.shade300,
+                ],
+              ),
             ),
+          ),
+
+          // Media Carousel (bottom half)
+          Expanded(
+            flex: 1,
+            child: _buildMediaCarousel(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -359,133 +359,149 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
   }
 
   Widget _buildPedidoCard(Map<String, dynamic> pedido) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(50),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.green.shade100, Colors.white],
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Header with status badge - Larger for TV
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 25),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.green.shade600, Colors.green.shade400],
-              ),
-              borderRadius: BorderRadius.circular(40),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.green.withOpacity(0.5),
-                  blurRadius: 25,
-                  offset: const Offset(0, 8),
-                ),
-              ],
+    // Use LayoutBuilder + SingleChildScrollView + ConstrainedBox + IntrinsicHeight
+    // so the Column can fill the available height (preserving Spacer) but
+    // becomes scrollable when content does not fit.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(50),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.green.shade100, Colors.white],
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.check_circle, color: Colors.white, size: 60),
-                const SizedBox(width: 25),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+          child: SingleChildScrollView(
+            // Allow vertical scrolling if card content is taller than available space.
+            physics: const ClampingScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      'PEDIDO LISTO',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 3,
+                    // Header with status badge - Larger for TV
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 25),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.green.shade600, Colors.green.shade400],
+                        ),
+                        borderRadius: BorderRadius.circular(40),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.green.withOpacity(0.5),
+                            blurRadius: 25,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.check_circle, color: Colors.white, size: 60),
+                          const SizedBox(width: 25),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'PEDIDO LISTO',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 3,
+                                ),
+                              ),
+                              Text(
+                                'Pedido #${pedido["order_id"]}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 48,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    Text(
-                      'Pedido #${pedido["order_id"]}',
-                      style: const TextStyle(
+
+                    const SizedBox(height: 50),
+
+                    // Customer info - Larger for TV visibility
+                    Container(
+                      padding: const EdgeInsets.all(40),
+                      decoration: BoxDecoration(
                         color: Colors.white,
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
+                        borderRadius: BorderRadius.circular(25),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.person, size: 48, color: Colors.blue),
+                          const SizedBox(width: 20),
+                          Flexible(
+                            child: Text(
+                              "${pedido["cliente_nombre"] ?? 'Cliente'}",
+                              style: const TextStyle(
+                                fontSize: 42,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+
+                    const Spacer(),
+
+                    // Page indicator - Larger for TV
+                    if (pedidos.length > 1)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          pedidos.length,
+                              (index) => Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 8),
+                            width: _currentPedidoIndex == index ? 50 : 15,
+                            height: 15,
+                            decoration: BoxDecoration(
+                              color: _currentPedidoIndex == index
+                                  ? Colors.green
+                                  : Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: _currentPedidoIndex == index
+                                  ? [
+                                BoxShadow(
+                                  color: Colors.green.withOpacity(0.5),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ]
+                                  : null,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 50),
-          
-          // Customer info - Larger for TV visibility
-          Container(
-            padding: const EdgeInsets.all(40),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(25),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.person, size: 48, color: Colors.blue),
-                const SizedBox(width: 20),
-                Flexible(
-                  child: Text(
-                    "${pedido["cliente_nombre"] ?? 'Cliente'}",
-                    style: const TextStyle(
-                      fontSize: 42,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          const Spacer(),
-          
-          // Page indicator - Larger for TV
-          if (pedidos.length > 1)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                pedidos.length,
-                (index) => Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 8),
-                  width: _currentPedidoIndex == index ? 50 : 15,
-                  height: 15,
-                  decoration: BoxDecoration(
-                    color: _currentPedidoIndex == index
-                        ? Colors.green
-                        : Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: _currentPedidoIndex == index
-                        ? [
-                            BoxShadow(
-                              color: Colors.green.withOpacity(0.5),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : null,
-                  ),
-                ),
               ),
             ),
-        ],
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -522,7 +538,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
     if (index < productos.length) {
       producto = productos[index];
     }
-    
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -598,7 +614,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
               ),
             ),
           ),
-          
+
           // Product name overlay at bottom
           if (producto != null)
             Positioned(
@@ -636,7 +652,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
                 ),
               ),
             ),
-          
+
           // Page indicator at top
           if (mediaUrls.length > 1)
             Positioned(
@@ -647,7 +663,7 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
                   mediaUrls.length,
-                  (i) => Container(
+                      (i) => Container(
                     margin: const EdgeInsets.symmetric(horizontal: 8),
                     width: _currentMediaIndex == i ? 50 : 15,
                     height: 15,
@@ -658,12 +674,12 @@ class _PedidosListosPageState extends State<PedidosListosPage> {
                       borderRadius: BorderRadius.circular(8),
                       boxShadow: _currentMediaIndex == i
                           ? [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ]
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
                           : null,
                     ),
                   ),
