@@ -503,7 +503,9 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                       categoryName: 'Todas',
                       count: widget.productos.length,
                       isSelected: categoriaSeleccionada == null,
-                      imageUrl: widget.productos.isNotEmpty && widget.productos.first.imageUrl != null
+                      imageUrl: widget.productos.isNotEmpty && 
+                               widget.productos.first.imageUrl != null &&
+                               widget.productos.first.imageUrl!.isNotEmpty
                           ? widget.productos.first.imageUrl!
                           : null,
                       onTap: () {
@@ -518,11 +520,19 @@ class _ProductosPorCategoriaPageState extends State<ProductosPorCategoriaPage> {
                       final productos = entry.value;
                       final count = productos.length;
                       final isSelected = categoriaSeleccionada == categoria;
-                      // Get first product image from this category
-                      final imageUrl = productos.firstWhere(
-                        (p) => p.imageUrl != null && p.imageUrl!.isNotEmpty,
-                        orElse: () => productos.first,
-                      ).imageUrl;
+                      // Get first product image from this category, safely
+                      String? imageUrl;
+                      try {
+                        final productWithImage = productos.firstWhere(
+                          (p) => p.imageUrl != null && p.imageUrl!.isNotEmpty,
+                          orElse: () => productos.first,
+                        );
+                        if (productWithImage.imageUrl != null && productWithImage.imageUrl!.isNotEmpty) {
+                          imageUrl = productWithImage.imageUrl;
+                        }
+                      } catch (e) {
+                        imageUrl = null;
+                      }
 
                       return _buildCategoryCard(
                         context: context,
