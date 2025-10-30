@@ -17,9 +17,7 @@ class POSTerminalPage extends StatefulWidget {
 class _POSTerminalPageState extends State<POSTerminalPage> {
   final ApiService api = ApiService();
   List<Product> _todosProductos = [];
-  List<Product> _productosF
-
-iltrados = [];
+  List<Product> _productosFiltrados = [];
   Map<int, int> _carrito = {}; // productId -> cantidad
   String _filtroCategoria = 'Todos';
   Set<String> _categorias = {'Todos'};
@@ -39,7 +37,7 @@ iltrados = [];
 
   Future<void> _cargarProductos() async {
     try {
-      final productos = await api.fetchProductos();
+      final productos = await api.fetchProducts();
       setState(() {
         _todosProductos = productos;
         _productosFiltrados = productos;
@@ -271,7 +269,7 @@ iltrados = [];
                                     _aplicarFiltros();
                                   });
                                 },
-                                selectedColor: AppTheme.primaryColor,
+                                selectedColor: AppTheme.primary,
                                 labelStyle: TextStyle(
                                   color: isSelected ? Colors.white : Colors.black,
                                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -684,7 +682,7 @@ iltrados = [];
                       onPressed: () => _removerDelCarrito(producto.id),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
-                      color: AppTheme.primaryColor,
+                      color: AppTheme.primary,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -701,7 +699,7 @@ iltrados = [];
                       onPressed: () => _agregarAlCarrito(producto),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
-                      color: AppTheme.primaryColor,
+                      color: AppTheme.primary,
                     ),
                   ],
                 ),
@@ -736,13 +734,13 @@ iltrados = [];
         });
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected ? AppTheme.primaryColor : Colors.white,
+        backgroundColor: isSelected ? AppTheme.primary : Colors.white,
         foregroundColor: isSelected ? Colors.white : Colors.black87,
         padding: const EdgeInsets.symmetric(vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
           side: BorderSide(
-            color: isSelected ? AppTheme.primaryColor : Colors.grey[300]!,
+            color: isSelected ? AppTheme.primary : Colors.grey[300]!,
             width: 2,
           ),
         ),

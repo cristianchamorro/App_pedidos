@@ -157,7 +157,7 @@ class _CajeroDashboardMejoradoPageState extends State<CajeroDashboardMejoradoPag
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: isSelected ? AppTheme.primaryColor : Colors.transparent,
+            color: isSelected ? AppTheme.primary : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -427,7 +427,7 @@ class _CajeroDashboardMejoradoPageState extends State<CajeroDashboardMejoradoPag
                       const FlSpot(6, 58000),
                     ],
                     isCurved: true,
-                    color: AppTheme.primaryColor,
+                    color: AppTheme.primary,
                     barWidth: 3,
                     isStrokeCapRound: true,
                     dotData: FlDotData(
@@ -435,7 +435,7 @@ class _CajeroDashboardMejoradoPageState extends State<CajeroDashboardMejoradoPag
                       getDotPainter: (spot, percent, barData, index) {
                         return FlDotCirclePainter(
                           radius: 4,
-                          color: AppTheme.primaryColor,
+                          color: AppTheme.primary,
                           strokeWidth: 2,
                           strokeColor: Colors.white,
                         );
@@ -443,7 +443,7 @@ class _CajeroDashboardMejoradoPageState extends State<CajeroDashboardMejoradoPag
                     ),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: AppTheme.primaryColor.withOpacity(0.2),
+                      color: AppTheme.primary.withOpacity(0.2),
                     ),
                   ),
                 ],

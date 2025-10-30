@@ -489,7 +489,7 @@ class _GestionMesasPageState extends State<GestionMesasPage> {
                         });
                       },
                       selectedColor: estado == 'Todas'
-                          ? AppTheme.primaryColor
+                          ? AppTheme.primary
                           : _getColorEstado(estado),
                       labelStyle: TextStyle(
                         color: isSelected ? Colors.white : Colors.black,
