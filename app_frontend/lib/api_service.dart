@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import 'models/categoria.dart';
@@ -12,14 +13,53 @@ class ApiService {
   late final String baseUrl;
 
   ApiService() {
-    if (kIsWeb) {
-      baseUrl = "http://localhost:3000";
-    } else if (Platform.isAndroid) {
-      baseUrl = "http://192.168.101.6:3000";
-    } else if (Platform.isIOS) {
-      baseUrl = "http://localhost:3000";
+    // Load backend URL from .env file if dotenv is initialized
+    String? envUrl;
+    
+    try {
+      // Check if dotenv is initialized before accessing it
+      if (dotenv.isInitialized) {
+        envUrl = dotenv.env['BACKEND_URL'];
+      }
+    } catch (e) {
+      // If there's any error accessing dotenv, continue with default
+      if (kDebugMode) {
+        print('Warning: Error accessing .env: $e');
+      }
+    }
+    
+    if (envUrl != null && envUrl.isNotEmpty) {
+      // Validate the URL format
+      final uri = Uri.tryParse(envUrl);
+      if (uri != null && uri.hasScheme && uri.hasAuthority) {
+        // Use the URL from .env file if valid
+        baseUrl = envUrl;
+        if (kDebugMode) {
+          print('Backend URL loaded from .env: $baseUrl');
+        }
+      } else {
+        // Invalid URL format, use default
+        if (kDebugMode) {
+          print('Warning: Invalid BACKEND_URL format in .env: $envUrl. Using default.');
+        }
+        baseUrl = _getDefaultUrl();
+      }
     } else {
-      baseUrl = "http://localhost:3000";
+      // No URL in .env, use default
+      baseUrl = _getDefaultUrl();
+    }
+  }
+
+  // Helper method to get default URL based on platform
+  String _getDefaultUrl() {
+    if (kIsWeb) {
+      return "http://localhost:3000";
+    } else if (Platform.isAndroid) {
+      return "http://192.168.101.6:3000";
+    } else if (Platform.isIOS) {
+      return "http://localhost:3000";
+    } else {
+      return "http://localhost:3000";
     }
   }
 
