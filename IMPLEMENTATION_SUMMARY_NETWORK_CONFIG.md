@@ -86,14 +86,6 @@ final url = Uri.parse('${_apiService.baseUrl}/pedidos');
 
 ### 3. Configuración del Proyecto
 
-#### `app_frontend/pubspec.yaml`
-Se agregó el archivo .env a los assets:
-```yaml
-assets:
-  - assets/sounds/
-  - .env
-```
-
 #### `.gitignore`
 Se agregó el archivo .env para excluirlo del control de versiones:
 ```

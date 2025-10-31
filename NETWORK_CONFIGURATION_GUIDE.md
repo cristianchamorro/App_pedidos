@@ -120,6 +120,25 @@ BACKEND_URL=http://10.0.2.2:3000
 2. Ejecuta `flutter clean`
 3. Vuelve a ejecutar `flutter run`
 
+### Error: "No file or variants found for asset: .env"
+
+Este error aparece si el archivo `.env` no existe en la carpeta `app_frontend/`.
+
+**Solución:**
+1. Copia el archivo de ejemplo:
+   ```bash
+   cd app_frontend
+   cp .env.example .env
+   ```
+2. Edita `.env` con tu configuración
+3. Ejecuta:
+   ```bash
+   flutter clean
+   flutter run
+   ```
+
+**Nota importante:** El archivo `.env` es cargado por `flutter_dotenv` directamente del sistema de archivos, NO de los assets de Flutter. No debe estar listado en `pubspec.yaml` bajo `assets:`.
+
 ## Notas Técnicas
 
 ### Archivos Modificados
@@ -129,7 +148,6 @@ BACKEND_URL=http://10.0.2.2:3000
 - `app_frontend/lib/api_service.dart` - Actualizado para leer de .env
 - `app_frontend/lib/main.dart` - Inicializa dotenv al inicio
 - `app_frontend/lib/pages/confirmar_pedido_page.dart` - Usa ApiService en lugar de URL hardcoded
-- `app_frontend/pubspec.yaml` - Incluye .env en assets
 
 ### Seguridad
 

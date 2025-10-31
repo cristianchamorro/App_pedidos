@@ -72,11 +72,10 @@
 ### Código Modificado
 
 ```
-💻 Frontend (4 archivos)
+💻 Frontend (3 archivos)
 ├── app_frontend/lib/api_service.dart      # Lee URL desde .env
 ├── app_frontend/lib/main.dart             # Inicializa dotenv
-├── app_frontend/lib/pages/confirmar_pedido_page.dart # Usa ApiService
-└── app_frontend/pubspec.yaml              # Incluye .env en assets
+└── app_frontend/lib/pages/confirmar_pedido_page.dart # Usa ApiService
 
 ⚙️ Configuración (2 archivos)
 ├── app_frontend/.env.example              # Template

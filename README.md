@@ -24,6 +24,8 @@ La aplicación ahora soporta configuración flexible del backend para trabajar e
 
 4. Reinicia la aplicación
 
+**Nota:** Si obtienes un error sobre "No file found for asset: .env", asegúrate de haber creado el archivo `.env` en la carpeta `app_frontend/` copiando desde `.env.example`. Este archivo debe existir físicamente pero NO debe estar listado en `pubspec.yaml`.
+
 ### Documentación Completa
 
 Para más detalles sobre la configuración de red, consulta [NETWORK_CONFIGURATION_GUIDE.md](NETWORK_CONFIGURATION_GUIDE.md)

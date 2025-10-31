@@ -171,7 +171,6 @@ if (kDebugMode) {
 - Added: `app_frontend/.env` (local configuration, excluded from git)
 - Added: `app_frontend/.env.example` (template)
 - Modified: `.gitignore` (exclude .env)
-- Modified: `pubspec.yaml` (include .env in assets)
 
 ### Security Review Status
 - ✅ Code review completed

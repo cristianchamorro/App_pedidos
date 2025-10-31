@@ -103,6 +103,21 @@ cp .env.example .env
 # Ahora edita el .env con tu IP
 ```
 
+### Error: "No file or variants found for asset: .env"
+
+Este error ocurre si el archivo `.env` no existe. **Importante:** El archivo `.env` debe estar en `app_frontend/`, no en assets. `flutter_dotenv` lo carga directamente del sistema de archivos.
+
+**Solución:**
+```bash
+cd app_frontend
+cp .env.example .env
+# Edita .env con tu IP
+flutter clean
+flutter run
+```
+
+**Nota:** El archivo `.env` NO debe estar listado en `pubspec.yaml` bajo `assets:`. Solo debe existir físicamente en la carpeta `app_frontend/`.
+
 ## 📚 Más Información
 
 - **Guía rápida en español:** [CONFIGURACION_RED.md](CONFIGURACION_RED.md)
