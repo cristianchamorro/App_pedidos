@@ -118,6 +118,24 @@ flutter run
 
 **Nota:** El archivo `.env` NO debe estar listado en `pubspec.yaml` bajo `assets:`. Solo debe existir físicamente en la carpeta `app_frontend/`.
 
+### Error: "NotInitializedError" al iniciar la app
+
+Si ves este error al iniciar la app, significa que el archivo `.env` no fue encontrado:
+
+**Solución:**
+1. Asegúrate de que el archivo `.env` existe en `app_frontend/`:
+   ```bash
+   cd app_frontend
+   cp .env.example .env
+   ```
+2. Edita `.env` con tu configuración
+3. Reinicia completamente la app (no hot reload):
+   ```bash
+   flutter run
+   ```
+
+La app ahora usará automáticamente los valores por defecto si no encuentra el archivo `.env`, pero debes crearlo para evitar advertencias.
+
 ## 📚 Más Información
 
 - **Guía rápida en español:** [CONFIGURACION_RED.md](CONFIGURACION_RED.md)

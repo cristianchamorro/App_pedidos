@@ -13,8 +13,20 @@ class ApiService {
   late final String baseUrl;
 
   ApiService() {
-    // Load backend URL from .env file
-    final envUrl = dotenv.env['BACKEND_URL'];
+    // Load backend URL from .env file if dotenv is initialized
+    String? envUrl;
+    
+    try {
+      // Check if dotenv is initialized before accessing it
+      if (dotenv.isInitialized) {
+        envUrl = dotenv.env['BACKEND_URL'];
+      }
+    } catch (e) {
+      // If there's any error accessing dotenv, continue with default
+      if (kDebugMode) {
+        print('Warning: Error accessing .env: $e');
+      }
+    }
     
     if (envUrl != null && envUrl.isNotEmpty) {
       // Validate the URL format

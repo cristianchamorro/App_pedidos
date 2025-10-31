@@ -139,6 +139,23 @@ Este error aparece si el archivo `.env` no existe en la carpeta `app_frontend/`.
 
 **Nota importante:** El archivo `.env` es cargado por `flutter_dotenv` directamente del sistema de archivos, NO de los assets de Flutter. No debe estar listado en `pubspec.yaml` bajo `assets:`.
 
+### Error: "NotInitializedError" al crear ApiService
+
+Si ves un error `NotInitializedError` al iniciar la aplicación, significa que `flutter_dotenv` no pudo cargar el archivo `.env`.
+
+**Causa:** El archivo `.env` no existe en `app_frontend/`.
+
+**Solución:**
+1. Crea el archivo `.env`:
+   ```bash
+   cd app_frontend
+   cp .env.example .env
+   ```
+2. Edita el archivo con tu configuración
+3. Reinicia la aplicación (no hot reload, reinicio completo)
+
+**Comportamiento actual:** La aplicación detecta automáticamente cuando `.env` no está inicializado y usa valores por defecto según la plataforma. Sin embargo, es recomendable crear el archivo `.env` para evitar advertencias.
+
 ## Notas Técnicas
 
 ### Archivos Modificados
