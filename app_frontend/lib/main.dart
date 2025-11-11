@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:app_pedidos/screens/location_screen.dart';
 import 'package:app_pedidos/pages/productos_por_categoria_page.dart';
 import 'package:app_pedidos/models/product.dart';
@@ -10,7 +11,18 @@ import 'package:app_pedidos/pages/domiciliario_page.dart';
 import 'package:app_pedidos/theme/app_theme.dart';
 import 'package:app_pedidos/pages/pedidos_listos_page.dart';
 
-void main() {
+void main() async {
+  // Initialize Flutter bindings
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Load environment variables from .env file
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    // If .env file doesn't exist or has issues, continue with default values
+    debugPrint('Warning: Could not load .env file. Using default backend configuration. Error: $e');
+  }
+  
   runApp(const MyApp());
 }
 
