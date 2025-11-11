@@ -3,6 +3,9 @@ import '../api_service.dart';
 import 'detalle_pedido_page.dart';
 import 'pago_page.dart'; // ⬅️ Importamos la pantalla de pago
 import 'cajero_dashboard_page.dart'; // ⬅️ Importamos el dashboard de cajero
+import 'cajero_dashboard_mejorado_page.dart'; // ⬅️ Dashboard mejorado con gráficos
+import 'pos_terminal_page.dart'; // ⬅️ Terminal POS
+import 'gestion_mesas_page.dart'; // ⬅️ Gestión de mesas
 import '../theme/app_theme.dart';
 
 class PedidosCajeroPage extends StatefulWidget {
@@ -66,6 +69,45 @@ class _PedidosCajeroPageState extends State<PedidosCajeroPage> {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
+          // Botón para Gestión de Mesas
+          IconButton(
+            icon: const Icon(Icons.table_restaurant, size: 28),
+            tooltip: "Gestión de Mesas",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GestionMesasPage(userId: _userId),
+                ),
+              );
+            },
+          ),
+          // Botón para Terminal POS
+          IconButton(
+            icon: const Icon(Icons.point_of_sale, size: 28),
+            tooltip: "Terminal POS",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => POSTerminalPage(userId: _userId),
+                ),
+              );
+            },
+          ),
+          // Botón para acceder al dashboard mejorado
+          IconButton(
+            icon: const Icon(Icons.bar_chart, size: 28),
+            tooltip: "Dashboard Mejorado",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CajeroDashboardMejoradoPage(userId: _userId),
+                ),
+              );
+            },
+          ),
           // Botón para acceder al módulo de caja completo
           IconButton(
             icon: const Icon(Icons.dashboard, size: 28),
