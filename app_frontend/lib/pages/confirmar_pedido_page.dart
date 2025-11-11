@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'package:app_pedidos/models/product.dart';
+import 'package:app_pedidos/api_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -26,6 +27,7 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
   late TextEditingController _nombreController;
   late TextEditingController _telefonoController;
   late TextEditingController _direccionController;
+  final ApiService _apiService = ApiService();
 
   bool _isLoading = false;
   bool _pedidoConfirmado = false;
@@ -85,7 +87,7 @@ class _ConfirmarPedidoPageState extends State<ConfirmarPedidoPage> {
             .toList(),
       };
 
-      final url = Uri.parse('http://192.168.101.6:3000/pedidos');
+      final url = Uri.parse('${_apiService.baseUrl}/pedidos');
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
