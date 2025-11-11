@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../screens/location_screen.dart';
 import 'login_admin_page.dart';
 import '../theme/app_theme.dart';
+import '../widgets/app_logo.dart';
 
 class LoginChoicePage extends StatelessWidget {
   const LoginChoicePage({super.key});
@@ -45,25 +46,11 @@ class LoginChoicePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // App Icon or Logo
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.primary.withOpacity(0.3),
-                      blurRadius: 15,
-                      spreadRadius: 5,
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.restaurant_menu,
-                  size: 80,
-                  color: AppTheme.primary,
-                ),
+              // App Logo
+              const AppLogo(
+                size: 120,
+                backgroundColor: Colors.white,
+                showCircleBackground: true,
               ),
               const SizedBox(height: 40),
               const Text(

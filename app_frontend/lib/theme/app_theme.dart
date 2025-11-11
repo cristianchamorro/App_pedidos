@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 
 /// App Theme for Food Delivery Application
-/// Uses a light blue color scheme suitable for food ordering apps
+/// Uses warm colors representative of the local restaurant
 class AppTheme {
-  // Primary Colors - Light Blue Theme
-  static const Color primary = Color(0xFF2196F3); // Blue 500
-  static const Color primaryLight = Color(0xFF64B5F6); // Blue 300
-  static const Color primaryDark = Color(0xFF1976D2); // Blue 700
-  static const Color primaryVeryLight = Color(0xFFE3F2FD); // Blue 50
+  // Primary Colors - Warm Red Theme (typical for restaurants/food businesses)
+  static const Color primary = Color(0xFFD32F2F); // Deep Red
+  static const Color primaryLight = Color(0xFFEF5350); // Light Red
+  static const Color primaryDark = Color(0xFFC62828); // Dark Red
+  static const Color primaryVeryLight = Color(0xFFFFEBEE); // Very Light Red
   
-  // Secondary Colors - Complementary Orange for food-related actions
-  static const Color secondary = Color(0xFFFF9800); // Orange 500
-  static const Color secondaryLight = Color(0xFFFFB74D); // Orange 300
-  static const Color secondaryDark = Color(0xFFF57C00); // Orange 700
+  // Secondary Colors - Warm Orange/Yellow for food-related actions
+  static const Color secondary = Color(0xFFFFA726); // Warm Orange
+  static const Color secondaryLight = Color(0xFFFFB74D); // Light Orange
+  static const Color secondaryDark = Color(0xFFF57C00); // Dark Orange
   
-  // Accent Colors
-  static const Color accent = Color(0xFF00BCD4); // Cyan 500
-  static const Color accentLight = Color(0xFF4DD0E1); // Cyan 300
+  // Accent Colors - Golden/Yellow for highlights
+  static const Color accent = Color(0xFFFFB300); // Amber/Golden
+  static const Color accentLight = Color(0xFFFFCA28); // Light Amber
   
   // Status Colors
   static const Color success = Color(0xFF4CAF50); // Green 500
-  static const Color warning = Color(0xFFFF9800); // Orange 500
-  static const Color error = Color(0xFFF44336); // Red 500
-  static const Color info = Color(0xFF2196F3); // Blue 500
+  static const Color warning = Color(0xFFFFA726); // Warm Orange
+  static const Color error = Color(0xFFD32F2F); // Red (matching primary)
+  static const Color info = Color(0xFFFFB300); // Golden (matching accent)
   
   // Neutral Colors
   static const Color background = Color(0xFFF5F5F5); // Grey 100

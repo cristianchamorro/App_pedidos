@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../api_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/app_logo.dart';
 
 class LoginAdminPage extends StatefulWidget {
   const LoginAdminPage({super.key});
@@ -142,17 +143,10 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppTheme.primary.withOpacity(0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.admin_panel_settings,
-                            size: 80,
-                            color: AppTheme.primary,
-                          ),
+                        const AppLogo(
+                          size: 100,
+                          backgroundColor: null,
+                          showCircleBackground: false,
                         ),
                         const SizedBox(height: 24),
                         const Text(
